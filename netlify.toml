@@ -1,0 +1,4 @@
+# O Netlify publica só a pasta "site". Não há passo de build.
+[build]
+  publish = "site"
+  command = ""
