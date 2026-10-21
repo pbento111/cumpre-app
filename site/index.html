@@ -654,6 +654,22 @@ var dbDoc = null, saveTimer = null, ultimoRemoto = 0;
 /* Versão online (app.cumpre.pt): login e dados no Supabase. Sem configuração, funciona como versão de teste. */
 var CFG = window.CUMPRE_CONFIG || null, ONLINE = !!(CFG && CFG.url && CFG.key);
 var supa = null;
+/* Links dos emails da Cumpre: app.cumpre.pt/?token_hash=…&type=… (ativar conta, palavra-passe nova, email novo).
+   O link só abre esta página; a conta só é ativada quando o aluno carrega no botão (os antivírus do email abrem links sozinhos). */
+var TIPOS_LINK = { email: 1, signup: 1, invite: 1, magiclink: 1, recovery: 1, email_change: 1 };
+var LINK = (function () {
+  if (!ONLINE) return null;
+  try {
+    var q = new URLSearchParams(location.search), th = q.get('token_hash'), ty = q.get('type');
+    var hp = new URLSearchParams((location.hash || '').replace(/^#/, ''));
+    if (th && TIPOS_LINK[ty]) { history.replaceState(null, '', location.pathname); return { hash: th, tipo: ty === 'signup' || ty === 'magiclink' ? 'email' : ty, orig: ty, estado: 'pronto', erro: '' }; }
+    var ec = hp.get('error_code') || hp.get('error');
+    if (ec) { history.replaceState(null, '', location.pathname); return { erroUrl: ec }; }
+    if (hp.get('access_token') && hp.get('type') === 'signup') return { ativada: true };
+  } catch (e) {}
+  return null;
+})();
+var linkRecuperacao = false;
 if (ONLINE) { try { supa = window.supabase.createClient(CFG.url, CFG.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } }); } catch (e) { supa = null; } }
 var sessao = null, chaveLocal = KEY;
 var AUTH = novoAuth(); AUTH.carregando = ONLINE;
@@ -710,7 +726,7 @@ function ligarConta() {
 
 /* ---------- Conta online (Supabase) ---------- */
 var envioT = null, aEnviar = false, porEnviar = false, remotoLido = false, canal = null, remotoPendente = null, avisouRede = false, tentarT = null;
-function novoAuth(tab) { return { tab: tab || 'criar', carregando: false, erroCarregar: false, fatal: false, recuperar: false, ocupado: false, erro: {}, aviso: '', email: '', pass: '', nasc: '', ee: '', eeOk: false }; }
+function novoAuth(tab) { return { tab: tab || 'criar', carregando: false, erroCarregar: false, fatal: false, recuperar: false, ocupado: false, erro: {}, aviso: '', email: '', pass: '', nasc: '', ee: '', eeOk: false, pendente: '', link: null }; }
 function aEditar() { var a = document.activeElement; return !!(a && (a.tagName === 'TEXTAREA' || (a.tagName === 'INPUT' && ['checkbox', 'file', 'button', 'submit', 'radio'].indexOf(a.type) < 0))); }
 function linhaEstado() { return { user_id: sessao.id, dados: JSON.parse(JSON.stringify(S)), atualizado: new Date(S.upd || Date.now()).toISOString() }; }
 function agendarEnvio(ms) {
@@ -771,10 +787,13 @@ function ligarTempoReal() {
 }
 function arrancarOnline() {
   if (!supa) { AUTH.carregando = false; AUTH.fatal = true; render(); return; }
+  if (LINK && LINK.hash) AUTH.link = LINK;
+  if (LINK && LINK.erroUrl) { AUTH.tab = 'entrar'; AUTH.erro = { geral: 'Este link do email já foi usado ou já expirou. Se já ativaste a conta, entra com o teu email e palavra-passe. Para mudar a palavra-passe, pede um link novo em "Esqueci-me da palavra-passe".' }; }
+  if (LINK && LINK.ativada) setTimeout(function () { toast('Conta ativada.'); }, 1500);
   render();
   supa.auth.onAuthStateChange(function (ev, s) {
     setTimeout(function () {
-      if (ev === 'PASSWORD_RECOVERY') AUTH.recuperar = true;
+      if (ev === 'PASSWORD_RECOVERY' && !linkRecuperacao) AUTH.recuperar = true;
       if (!s || !s.user) { if (sessao) sairLocal(); else if (AUTH.carregando) { AUTH.carregando = false; render(); } return; }
       aplicarSessao(s);
       if (AUTH.recuperar && !AUTH.carregando) { AUTH.recuperar = false; janNovaPasse(); }
@@ -871,6 +890,7 @@ function msgAuth(e) {
   if (c === 'invalid_credentials' || /invalid login credentials/.test(m)) return 'Email ou palavra-passe errados.';
   if (c === 'user_already_exists' || c === 'email_exists' || /already registered|already exists/.test(m)) return 'Já existe uma conta com este email. Entra com a tua palavra-passe.';
   if (c === 'email_not_confirmed' || /not confirmed/.test(m)) return 'Ainda não ativaste a conta. Abre o link que enviámos para o teu email.';
+  if (c === 'otp_expired' || /token has expired|link is invalid|has expired/.test(m)) return 'Este link já foi usado ou já expirou.';
   if (c === 'same_password' || /different from the old/.test(m)) return 'Essa já é a tua palavra-passe.';
   if (c === 'weak_password' || (/password/.test(m) && /weak|short|least|characters/.test(m))) return 'Escolhe uma palavra-passe mais difícil de adivinhar, com pelo menos 8 caracteres.';
   if (c === 'over_email_send_rate_limit' || /email rate limit/.test(m)) return 'Enviámos demasiados emails na última hora. Tenta mais tarde.';
@@ -908,12 +928,12 @@ function enviarAuth() {
   else p = supa.auth.resetPasswordForEmail(email, { redirectTo: volta });
   p.then(function (r) {
     X.ocupado = false;
-    if (r.error) { X.erro = { geral: msgAuth(r.error) }; if (X.tab === 'criar' && /Já existe/.test(X.erro.geral)) X.tab = 'entrar'; render(); var a = $('#auth [role="alert"]'); if (a) a.scrollIntoView({ block: 'center' }); return; }
-    if (X.tab === 'recuperar') { X.tab = 'entrar'; X.aviso = 'Se houver uma conta com ' + email + ', enviámos um email com um link para escolheres uma palavra-passe nova.'; render(); return; }
+    if (r.error) { X.erro = { geral: msgAuth(r.error) }; if (X.tab === 'criar' && /Já existe/.test(X.erro.geral)) X.tab = 'entrar'; if (r.error.code === 'email_not_confirmed' || /not confirmed/i.test(r.error.message || '')) X.pendente = email; render(); var a = $('#auth [role="alert"]'); if (a) a.scrollIntoView({ block: 'center' }); return; }
+    if (X.tab === 'recuperar') { X.tab = 'entrar'; X.aviso = 'Se houver uma conta com ' + email + ', enviámos um email com um link para escolheres uma palavra-passe nova. Se não aparecer em poucos minutos, vê a pasta de spam.'; render(); return; }
     if (X.tab === 'criar' && !(r.data && r.data.session)) {
       X.tab = 'entrar'; X.pass = '';
       if (r.data && r.data.user && r.data.user.identities && !r.data.user.identities.length) X.erro = { geral: 'Já existe uma conta com este email. Entra com a tua palavra-passe.' };
-      else X.aviso = 'Enviámos um email para ' + email + '. Abre o link para ativar a conta e depois entra aqui.';
+      else { X.aviso = 'Enviámos um email para ' + email + ' com o link para ativares a conta. Se não aparecer em poucos minutos, vê a pasta de spam.'; X.pendente = email; }
       render(); return;
     }
     X.pass = '';
@@ -2113,6 +2133,7 @@ function ir(v, extra) { Object.assign(UI, { view: v }, extra || {}); render(); w
 function render() {
   var app = $('#app');
   aplicarPaleta();
+  if (ONLINE && AUTH.link) { app.innerHTML = vLink(); return; }
   if (ONLINE && (!sessao || AUTH.carregando || AUTH.erroCarregar)) { app.innerHTML = sessao && (AUTH.carregando || AUTH.erroCarregar) ? vCarregar() : (AUTH.carregando ? vCarregar() : vAuth()); return; }
   if (!S.perfil || W) { if (!W) W = novoRegisto(); app.innerHTML = vRegisto(); posRegisto(); return; }
   var y = window.scrollY;
@@ -2170,15 +2191,26 @@ function discNome(id) { var d = discById(id); return d ? d.n : 'Geral'; }
 function discCor(id) { var d = discById(id); return d ? 'c' + d.c : 'c4'; }
 
 /* ---------- Registo (login) ---------- */
-function asideRegisto() {
+function asideRegisto(registo) {
+  var T = registo ? {
+    big: W && W.editar ? 'Os teus dados da escola.' : 'Vamos preparar a tua Cumpre.',
+    sub: 'Escolhes o ano, a escola e o curso. A partir daí, a Cumpre prepara as disciplinas e o teu estudo.',
+    li: ['Escolas e cursos das listas oficiais de todo o país', 'As disciplinas do teu ano aparecem sozinhas', 'Depois juntas o horário e as datas dos testes'],
+    pe: 'Escolas: InfoEscolas (DGEEC), fevereiro de 2025. Cursos superiores: InfoCursos 2026 (DGEEC).'
+  } : {
+    big: 'Cumpre o que tens para estudar.',
+    sub: 'O horário, os testes e os trabalhos num só sítio. Todos os dias sabes o que estudar para chegares ao teste preparado.',
+    li: ['Um plano até cada teste, dia a dia', 'Modo foco e lembretes antes dos testes', 'Pontos por estudar, para trocar na loja'],
+    pe: 'Grátis, do 1.º ano à universidade.'
+  };
   return '<aside class="ob-aside">' +
       '<span class="brand" style="color:var(--hero-ink)">cumpre</span>' +
-      '<div class="stack-lg" style="max-width:520px"><p class="big">A tua escola, organizada.</p>' +
-        '<p style="font-size:18px;color:var(--hero-muted)">Do 1.º ano à universidade. As tuas pastas, as datas da tua turma e pontos que trocas por resumos.</p>' +
+      '<div class="stack-lg" style="max-width:520px"><p class="big">' + T.big + '</p>' +
+        '<p style="font-size:18px;color:var(--hero-muted)">' + T.sub + '</p>' +
         '<ul style="list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:14px">' +
-          ['Escolhes a escola e o curso numa lista oficial de todo o país', 'As disciplinas do teu ano aparecem sozinhas', 'Estudas, ganhas pontos e trocas por resumos'].map(function (t) { return '<li><span class="tick">' + ic('check', 'sm') + '</span><span>' + t + '</span></li>'; }).join('') +
+          T.li.map(function (t) { return '<li><span class="tick">' + ic('check', 'sm') + '</span><span>' + t + '</span></li>'; }).join('') +
         '</ul></div>' +
-      '<p class="xs" style="color:var(--hero-muted)">Escolas: InfoEscolas (DGEEC), fevereiro de 2025. Cursos superiores: InfoCursos 2026 (DGEEC).</p>' +
+      '<p class="xs" style="color:var(--hero-muted)">' + T.pe + '</p>' +
     '</aside>';
 }
 function vEcra(t, sub, extra) { return '<main class="ecra"><span class="brand">cumpre</span><div class="stack" style="align-items:center;gap:12px;max-width:420px"><h1 style="font-size:24px">' + esc(t) + '</h1>' + (sub ? '<p class="muted">' + esc(sub) + '</p>' : '') + (extra || '') + '</div></main>'; }
@@ -2215,10 +2247,73 @@ function vAuth() {
         '</div>' : '') +
     '</div>' +
     '<button type="submit" class="btn lg"' + (X.ocupado ? ' disabled' : '') + '>' + (X.ocupado ? 'Um momento…' : (criar ? 'Criar conta' : rec ? 'Enviar link' : 'Entrar') + ic('arrowR')) + '</button>' +
-    (t === 'entrar' ? '<button type="button" class="link-btn" data-a="auth-tab" data-k="recuperar" style="align-self:flex-start">Esqueci-me da palavra-passe</button>' : '') +
+    (t === 'entrar' ? '<div class="stack" style="gap:8px;align-items:flex-start"><button type="button" class="link-btn" data-a="auth-tab" data-k="recuperar">Esqueci-me da palavra-passe</button>' + (X.pendente ? '<button type="button" class="link-btn" data-a="auth-reenviar"' + (X.ocupado ? ' disabled' : '') + '>Não recebeste o email de ativação? Enviar outra vez</button>' : '') + '</div>' : '') +
     (rec ? '<button type="button" class="link-btn" data-a="auth-tab" data-k="entrar" style="align-self:flex-start">Voltar para entrar</button>' : '') +
     (criar ? '<p class="xs muted">Guardamos o teu email, a data de nascimento e o que juntares na Cumpre só para a app funcionar. Podes apagar a conta quando quiseres, no Perfil.</p>' : '') +
   '</form></main></div>';
+}
+function vLink() {
+  var L = AUTH.link, conv = L.tipo === 'invite', rec = L.tipo === 'recovery' || conv, mud = L.tipo === 'email_change', ml = L.orig === 'magiclink', ocup = L.estado === 'ocupado';
+  var titulo, sub, corpo;
+  if (L.estado === 'erro') {
+    titulo = 'Este link já não funciona';
+    sub = L.tipo === 'recovery' ? 'Já foi usado ou já expirou. Pede um link novo e abre-o logo a seguir.' : L.tipo === 'email' && !ml ? 'Já foi usado ou já expirou. Se já ativaste a conta, entra com o teu email e palavra-passe. Se não, pede outro email de ativação.' : 'Já foi usado ou já expirou.';
+    corpo = L.tipo === 'recovery' ? '<button type="button" class="btn lg" data-a="link-sair" data-k="recuperar">Pedir um link novo' + ic('arrowR') + '</button>'
+      : '<button type="button" class="btn lg" data-a="link-sair" data-k="entrar">Entrar' + ic('arrowR') + '</button>' + (L.tipo === 'email' && !ml ? '<button type="button" class="btn lg ghost" data-a="link-sair" data-k="reenviar">Pedir outro email de ativação</button>' : '');
+  } else if (rec) {
+    titulo = conv ? 'Escolhe a tua palavra-passe' : 'Escolhe uma palavra-passe nova';
+    sub = (conv ? 'Recebeste um convite para a Cumpre. ' : '') + 'É a que vais usar para entrar na Cumpre. Depois de guardares, entras logo na tua conta.';
+    corpo = '<div class="field"><label for="lk-pass">Palavra-passe nova</label><input class="input" id="lk-pass" type="password" autocomplete="new-password" value="' + esc(L.pass || '') + '"' + (L.erro ? ' aria-invalid="true" aria-describedby="lk-err"' : ' aria-describedby="lk-hint"') + '>' +
+      (L.erro ? '<p class="err" id="lk-err">' + esc(L.erro) + '</p>' : '<p class="hint" id="lk-hint">Pelo menos 8 caracteres.</p>') + '</div>' +
+      '<button type="submit" class="btn lg"' + (ocup ? ' disabled' : '') + '>' + (ocup ? 'Um momento…' : 'Guardar e entrar' + ic('arrowR')) + '</button>';
+  } else {
+    titulo = mud ? 'Confirma o teu email novo' : ml ? 'Entrar na Cumpre' : 'Ativa a tua conta';
+    sub = mud ? 'Carrega no botão para passares a entrar na Cumpre com este email.' : ml ? 'Carrega no botão para entrares na tua conta.' : 'Falta só este passo. Carrega no botão para ativares a conta e começares.';
+    corpo = (L.erro ? '<div class="notice warn" role="alert">' + ic('lock') + '<span>' + esc(L.erro) + '</span></div>' : '') +
+      '<button type="submit" class="btn lg"' + (ocup ? ' disabled' : '') + '>' + (ocup ? 'Um momento…' : (mud ? 'Confirmar email' : ml ? 'Entrar' : 'Ativar conta') + ic('arrowR')) + '</button>';
+  }
+  return '<div class="ob">' + asideRegisto() + '<main class="ob-main"><form class="ob-form" id="link" novalidate>' +
+    '<div class="row between ob-mobile-brand"><span class="brand">cumpre</span></div>' +
+    '<div class="stack"><h1>' + titulo + '</h1><p class="muted">' + sub + '</p></div>' + corpo +
+  '</form></main></div>';
+}
+function enviarLink() {
+  var L = AUTH.link;
+  if (!L || L.estado === 'ocupado' || L.estado === 'erro') return;
+  var rec = L.tipo === 'recovery' || L.tipo === 'invite', pass = '';
+  if (rec) {
+    var f = $('#lk-pass'); pass = f ? f.value : ''; L.pass = pass;
+    if (pass.length < 8) { L.erro = 'A palavra-passe precisa de pelo menos 8 caracteres.'; render(); var g = $('#lk-pass'); if (g) g.focus(); return; }
+    if (L.tipo === 'recovery') linkRecuperacao = true;
+  }
+  L.estado = 'ocupado'; L.erro = ''; render();
+  var falhou = function () { if (AUTH.link !== L) return; L.estado = 'pronto'; L.erro = 'Sem ligação à internet. Tenta outra vez.'; render(); };
+  (L.verificado ? Promise.resolve({ error: null }) : supa.auth.verifyOtp({ token_hash: L.hash, type: L.tipo })).then(function (r) {
+    if (AUTH.link !== L) return;
+    if (r.error) {
+      if (/fetch|network|load failed/i.test(r.error.message || '')) { falhou(); return; }
+      L.estado = 'erro'; L.pass = ''; render(); return;
+    }
+    L.verificado = true;
+    if (!rec) { AUTH.link = null; AUTH.tab = 'entrar'; AUTH.pendente = ''; AUTH.carregando = AUTH.carregando || !sessao; render(); toast(L.tipo === 'email_change' ? 'Email confirmado.' : L.orig === 'magiclink' ? 'Entraste na tua conta.' : 'Conta ativada.'); return; }
+    return supa.auth.updateUser({ password: pass }).then(function (u) {
+      if (AUTH.link !== L) return;
+      if (u.error) { L.estado = 'pronto'; L.erro = msgAuth(u.error); render(); return; }
+      AUTH.link = null; AUTH.recuperar = false; L.pass = ''; render(); toast(L.tipo === 'invite' ? 'Palavra-passe guardada. Bem-vindo à Cumpre.' : 'Palavra-passe mudada. Já estás dentro da tua conta.');
+    }, falhou);
+  }, falhou);
+}
+function reenviarAtivacao() {
+  var X = AUTH, email = (X.email || X.pendente || '').trim().toLowerCase();
+  if (!RX_EMAIL.test(email)) { X.erro = { email: 'Escreve o email com que criaste a conta.' }; X.aviso = ''; render(); var f = $('#a-email'); if (f) f.focus(); return; }
+  if (X.ocupado) return;
+  X.ocupado = true; render();
+  supa.auth.resend({ type: 'signup', email: email, options: { emailRedirectTo: location.origin + location.pathname } }).then(function (r) {
+    X.ocupado = false;
+    if (r.error) { X.erro = { geral: msgAuth(r.error) }; X.aviso = ''; }
+    else { X.erro = {}; X.pendente = email; X.aviso = 'Enviámos outra vez o email de ativação para ' + email + '. Se não aparecer em poucos minutos, vê a pasta de spam.'; }
+    render();
+  }, function () { X.ocupado = false; X.erro = { geral: 'Sem ligação à internet. Tenta outra vez.' }; render(); });
 }
 function janNovaPasse() {
   abrir(cab('Palavra-passe nova', 'É a que vais usar para entrar na Cumpre.') + '<form class="stack" data-f="nova-passe"><div class="field"><label for="np">Palavra-passe nova</label><input class="input" id="np" type="password" autocomplete="new-password" required><p class="hint">Pelo menos 8 caracteres.</p></div><p class="err" id="np-err" hidden></p><div class="row"><button type="button" class="btn ghost grow" data-a="fechar">Cancelar</button><button class="btn grow" type="submit">Guardar</button></div></form>', '#np');
@@ -2249,7 +2344,7 @@ function vRegisto() {
   var corpo = { sobre: rSobre, ano: rAno, escola: rEscola, curso: rCurso, disciplinas: rDisciplinas, pronto: rPronto }[cur]();
   var ultimo = cur === 'pronto';
   return '<div class="ob">' +
-    asideRegisto() +
+    asideRegisto(true) +
     '<main class="ob-main"><form class="ob-form" id="ob" novalidate>' +
       '<div class="row between ob-mobile-brand"><span class="brand">cumpre</span>' + (W.editar ? '<button type="button" class="btn quiet sm" data-a="ob-cancelar">Cancelar</button>' : '') + '</div>' +
       '<div class="steps" aria-hidden="true">' + P.map(function (_, i) { return '<i class="' + (i <= W.passo ? 'on' : '') + '"></i>'; }).join('') + '</div>' +
@@ -3064,6 +3159,13 @@ var A = {
   'apagar-tudo-ok': function (el) { if (ONLINE) { apagarConta(el); return; } S.notas.forEach(function (x) { (x.anexos || []).forEach(function (a) { if (a.onde === 'conta') apagarFicheiro(a); }); }); if (S.perfil && S.perfil.foto && S.perfil.foto.onde === 'conta') apagarFicheiro(S.perfil.foto); IDB.limpar().catch(function () {}); S = estadoVazio(); S.upd = Date.now(); try { localStorage.removeItem(KEY); } catch (e) {} if (dbDoc) dbDoc.delete().catch(function () {}); fechar(); W = null; UI.view = 'hoje'; render(); },
   'auth-tab': function (el) { AUTH.tab = el.dataset.k; AUTH.erro = {}; AUTH.aviso = ''; render(); var f = $('#a-email'); if (f) f.focus(); },
   'auth-repetir': function () { carregarConta(); },
+  'auth-reenviar': function () { reenviarAtivacao(); },
+  'link-sair': function (el) {
+    var k = el.dataset.k; AUTH.link = null; AUTH.erro = {}; AUTH.aviso = '';
+    if (k === 'reenviar') { AUTH.tab = 'entrar'; AUTH.pendente = AUTH.pendente || ' '; AUTH.aviso = 'Escreve o email com que criaste a conta e carrega em "Enviar outra vez".'; }
+    else AUTH.tab = k;
+    render(); var f = $('#a-email'); if (f && !sessao) f.focus();
+  },
   sair: function () { terminarSessao(); },
   recarregar: function () { location.reload(); },
   'nova-passe': function () { janNovaPasse(); },
@@ -3215,6 +3317,7 @@ document.addEventListener('submit', function (e) {
   var f = e.target; e.preventDefault();
   if (f.id === 'ob') { avancar(); return; }
   if (f.id === 'auth') { if (!AUTH.ocupado) enviarAuth(); return; }
+  if (f.id === 'link') { enviarLink(); return; }
   var k = f.dataset.f;
   if (k === 'tarefa') {
     var v = $('#n-tarefa').value.trim(); if (!v) return;
