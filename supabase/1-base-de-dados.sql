@@ -157,7 +157,7 @@ on conflict (chave) do nothing;
 
 -- 7. Agendador: de 10 em 10 minutos pede à função "cumpre" que envie os lembretes que chegaram à hora.
 create extension if not exists pg_cron;
-create extension if not exists pg_net;
+create extension if not exists pg_net with schema extensions;
 select cron.unschedule(jobid) from cron.job where jobname = 'cumpre-lembretes';
 select cron.schedule('cumpre-lembretes', '*/10 * * * *', $cron$
   select net.http_post(
@@ -167,3 +167,11 @@ select cron.schedule('cumpre-lembretes', '*/10 * * * *', $cron$
     timeout_milliseconds := 30000
   );
 $cron$);
+
+-- 8. Função que o Supabase cria para ligar a proteção nas tabelas novas: não precisa de estar aberta à API.
+do $$
+begin
+  if exists (select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace where n.nspname = 'public' and p.proname = 'rls_auto_enable') then
+    revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
+  end if;
+end $$;
