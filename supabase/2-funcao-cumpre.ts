@@ -179,7 +179,7 @@ async function lerComIA(corpo: any, alunoId: string, modo: 'horario' | 'quadro')
   let ferramenta: typeof FERRAMENTA_HORARIO | typeof FERRAMENTA_QUADRO;
   if (modo === 'quadro') {
     const hoje = /^\d{4}-\d{2}-\d{2}$/.test(String(cx.hoje || '')) ? String(cx.hoje) : new Date().toISOString().slice(0, 10);
-    pedido = `A imagem é uma foto do quadro, do caderno ou da plataforma da escola com trabalhos de casa ou tarefas de um aluno em Portugal. Tira todas as tarefas e guarda-as com a ferramenta guardar_tarefas.
+    pedido = `A imagem é uma foto do quadro, do caderno ou da plataforma da escola com trabalhos de casa ou tarefas de um aluno em Portugal. Tira todas as tarefas e guarda-as com a ferramenta guardar_tarefas (usa sempre a ferramenta; não respondas com texto).
 Hoje é ${hoje}${cx.diaSemana ? ` (${curto(cx.diaSemana, 20)})` : ''}.
 Disciplinas do aluno (id: nome):
 ${listaDisciplinas(cx)}
@@ -188,7 +188,7 @@ ${REGRAS_QUADRO}`;
     ferramenta = FERRAMENTA_QUADRO;
   } else {
     const quem = [cx.nivel, cx.ano ? `${curto(cx.ano, 4)}.º ano` : '', cx.curso, cx.escola].map((v) => curto(v, 120)).filter(Boolean).join(', ');
-    pedido = `${tipo === 'application/pdf' ? 'O ficheiro' : 'A imagem'} é o horário semanal de um aluno em Portugal. Tira todas as aulas e guarda-as com a ferramenta guardar_horario.
+    pedido = `${tipo === 'application/pdf' ? 'O ficheiro' : 'A imagem'} é o horário semanal de um aluno em Portugal. Tira todas as aulas e guarda-as com a ferramenta guardar_horario (usa sempre a ferramenta; não respondas com texto).
 Aluno: ${quem || 'sem dados'}.
 Disciplinas que o aluno tem (id: nome):
 ${listaDisciplinas(cx)}
@@ -207,9 +207,10 @@ ${REGRAS_HORARIO}`;
       headers: { 'x-api-key': chaveIA, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
         model: Deno.env.get('CUMPRE_MODELO_IA') || 'claude-sonnet-5-5',
-        max_tokens: 4096,
+        max_tokens: 8000,
         tools: [ferramenta],
-        tool_choice: { type: 'tool', name: ferramenta.name },
+        // Os modelos novos não aceitam obrigar a usar uma ferramenta: pede-se no texto e lê-se também JSON escrito.
+        tool_choice: { type: 'auto' },
         messages: [{ role: 'user', content: [ficheiro, { type: 'text', text: pedido }] }],
       }),
       signal: AbortSignal.timeout(100000),
@@ -229,8 +230,16 @@ ${REGRAS_HORARIO}`;
   const r = await resposta.json();
   // deno-lint-ignore no-explicit-any
   const uso = Array.isArray(r.content) ? r.content.find((c: any) => c.type === 'tool_use') : null;
-  if (!uso?.input) return json({ erro: 'Não deu para ler esta foto. Tenta com uma foto mais nítida.' }, 502);
-  return json(uso.input);
+  if (uso?.input) return json(uso.input);
+  // Sem ferramenta: procura um objeto JSON no texto da resposta.
+  // deno-lint-ignore no-explicit-any
+  const texto = Array.isArray(r.content) ? r.content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n') : '';
+  const i = texto.indexOf('{'), f = texto.lastIndexOf('}');
+  if (i >= 0 && f > i) {
+    try { return json(JSON.parse(texto.slice(i, f + 1))); } catch { /* segue */ }
+  }
+  console.error('Resposta sem dados', r.stop_reason, texto.slice(0, 300));
+  return json({ erro: 'Não deu para ler esta foto. Tenta com uma foto mais nítida.' }, 502);
 }
 
 // ---------- Lembretes no telemóvel (Web Push, RFC 8291 + VAPID RFC 8292) ----------
