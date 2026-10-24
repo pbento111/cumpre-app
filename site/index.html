@@ -1233,11 +1233,13 @@ var ALIAS = [[/\bmat\b/, 'matematica'], [/\bport\b/, 'portugues'], [/\bf\.? ?q\.
 var STOP_SIGLA = { de: 1, da: 1, do: 1, das: 1, dos: 1, e: 1, a: 1, o: 1, em: 1, para: 1, ao: 1, aos: 1, as: 1, os: 1, com: 1, na: 1, no: 1, nas: 1, nos: 1 };
 /* "Introdução à Programação" → "ip": é assim que os horários (Nónio e outros) costumam abreviar as cadeiras. */
 function sigla(n) { return norm(n).replace(/[^a-z0-9 ]/g, ' ').split(/\s+/).filter(function (w) { return w && !STOP_SIGLA[w]; }).map(function (w) { return /^(i{1,3}|iv|vi{0,3}|ix|x)$/.test(w) ? w : w[0]; }).join(''); }
-function discPorCodigo(cod) { var c = norm(cod); if (!c) return null; return S.disciplinas.find(function (d) { return norm(d.n) === c; }) || S.disciplinas.find(function (d) { return sigla(d.n) === c; }) || null; }
+function listaDisc() { return W && W.regDisc ? W.regDisc : S.disciplinas; }
+function discPorCodigo(cod) { var c = norm(cod), L = listaDisc(); if (!c) return null; return L.find(function (d) { return norm(d.n) === c; }) || L.find(function (d) { return sigla(d.n) === c; }) || null; }
 function discPorTexto(n) {
   var melhor = null;
-  S.disciplinas.forEach(function (d) { var dn = norm(d.n); if (dn.length > 2 && n.indexOf(dn) >= 0 && (!melhor || dn.length > norm(melhor.n).length)) melhor = d; });
-  if (!melhor) ALIAS.some(function (al) { if (!al[0].test(n)) return false; melhor = S.disciplinas.find(function (d) { return norm(d.n).indexOf(al[1]) === 0; }) || null; return !!melhor; });
+  var L = listaDisc();
+  L.forEach(function (d) { var dn = norm(d.n); if (dn.length > 2 && n.indexOf(dn) >= 0 && (!melhor || dn.length > norm(melhor.n).length)) melhor = d; });
+  if (!melhor) ALIAS.some(function (al) { if (!al[0].test(n)) return false; melhor = L.find(function (d) { return norm(d.n).indexOf(al[1]) === 0; }) || null; return !!melhor; });
   return melhor;
 }
 function classificarICS(e) {
@@ -1339,6 +1341,8 @@ function temAulasEscola() { return !!(S.calEscola && S.calEscola.eventos.some(fu
 var sampleApi = null, sampleImg = false, leituraN = 0;
 function podeLerHorario() { return ONLINE ? !!supa : !!(sampleApi && sampleImg); }
 function contextoHorario() {
+  if (W && W.regDisc) return { nivel: NIVEIS[W.nivel] || '', ano: W.ano || '', curso: (W.curso && W.curso.n) || '', escola: (W.escola && W.escola.n) || '',
+    disciplinas: W.regDisc.slice(0, 40).map(function (d) { return { id: d.id, n: d.n }; }) };
   var p = S.perfil || {};
   return { nivel: NIVEIS[p.nivel] || '', ano: p.ano || '', curso: (p.curso && p.curso.n) || '', escola: (p.escola && p.escola.n) || '',
     disciplinas: S.disciplinas.slice(0, 40).map(function (d) { return { id: d.id, n: d.n }; }) };
@@ -1368,7 +1372,7 @@ function horaValida(h) {
 /* Limpa o que a IA devolveu: só aulas com dia e horas válidos, ligadas às disciplinas do aluno. */
 function normalizarLeitura(r) {
   if (!r || typeof r !== 'object' || r.horario === false) return null;
-  var ids = {}; S.disciplinas.forEach(function (d) { ids[d.id] = d; });
+  var ids = {}; listaDisc().forEach(function (d) { ids[d.id] = d; });
   var L = [];
   (Array.isArray(r.aulas) ? r.aulas : []).slice(0, 120).forEach(function (a) {
     if (!a || typeof a !== 'object') return;
@@ -1467,9 +1471,9 @@ function novasNaLeitura(soAtivas) {
   (UI.leitura ? UI.leitura.aulas : []).forEach(function (x) { if (x.disc.indexOf('nova:') === 0 && (!soAtivas || x.on)) { var n = x.disc.slice(5); if (L.indexOf(n) < 0) L.push(n); } });
   return L;
 }
-function textoNovas(L) { return L.length ? 'Vamos juntar ' + (L.length === 1 ? 'a disciplina ' : 'as disciplinas ') + L.join(', ') + ', que não estava' + (L.length === 1 ? '' : 'm') + ' na tua lista.' : ''; }
+function textoNovas(L) { if (W && W.regDisc) return ''; return L.length ? 'Vamos juntar ' + (L.length === 1 ? 'a disciplina ' : 'as disciplinas ') + L.join(', ') + ', que não estava' + (L.length === 1 ? '' : 'm') + ' na tua lista.' : ''; }
 function opcoesLeitura(sel, novas) {
-  return S.disciplinas.map(function (d) { return '<option value="' + esc(d.id) + '"' + (d.id === sel ? ' selected' : '') + '>' + esc(d.n) + '</option>'; }).join('') +
+  return listaDisc().map(function (d) { return '<option value="' + esc(d.id) + '"' + (d.id === sel ? ' selected' : '') + '>' + esc(d.n) + '</option>'; }).join('') +
     novas.map(function (n) { var v = 'nova:' + n; return '<option value="' + esc(v) + '"' + (v === sel ? ' selected' : '') + '>Nova: ' + esc(n) + '</option>'; }).join('');
 }
 function linhaLeitura(x, i, novas) {
@@ -1491,7 +1495,7 @@ function janConfirmarHorario() {
       return '<div class="stack" style="gap:8px"><p class="label">' + cap(DIAS[k]) + '</p>' + porDia[k].map(function (i) { return linhaLeitura(lt.aulas[i], i, novas); }).join('') + '</div>';
     }).join('') + '</div>' +
     '<div class="notice" id="lh-novas"' + (novasOn.length ? '' : ' hidden') + '>' + ic('plus') + '<span>' + esc(textoNovas(novasOn)) + '</span></div>' +
-    (S.aulas.length ? '<fieldset class="stack" style="border:0;padding:0;margin:0;min-width:0"><legend class="label" style="margin-bottom:8px">O horário que já tens (' + plural(S.aulas.length, 'aula', 'aulas') + ')</legend>' +
+    (S.aulas.length && !(W && W.regDisc) ? '<fieldset class="stack" style="border:0;padding:0;margin:0;min-width:0"><legend class="label" style="margin-bottom:8px">O horário que já tens (' + plural(S.aulas.length, 'aula', 'aulas') + ')</legend>' +
       '<label class="check"><input type="radio" name="lh-modo" data-lh="modo" value="substituir"' + (lt.modo !== 'juntar' ? ' checked' : '') + '><span>Substituir pelo da foto</span></label>' +
       '<label class="check"><input type="radio" name="lh-modo" data-lh="modo" value="juntar"' + (lt.modo === 'juntar' ? ' checked' : '') + '><span>Juntar ao que já tens</span></label></fieldset>' : '') +
     '<p class="err" id="lh-err" role="alert" hidden></p>' +
@@ -1518,6 +1522,7 @@ function guardarLeitura() {
     if (cf) { cf.setAttribute('aria-invalid', 'true'); cf.focus(); }
     return;
   }
+  if (W && W.regDisc) { guardarLeituraRegisto(lt, sel); return; }
   var criadas = {}, novasN = [];
   function discDe(v) {
     if (v.indexOf('nova:') !== 0) return v;
@@ -1540,6 +1545,18 @@ function guardarLeitura() {
   toast('Horário guardado: ' + plural(n, 'aula', 'aulas') + '.' + (novasN.length ? ' Juntámos ' + novasN.join(', ') + ' às tuas disciplinas.' : ''));
 }
 
+
+function guardarLeituraRegisto(lt, sel) {
+  function nomeDe(v) { if (v.indexOf('nova:') === 0) return v.slice(5); var d = W.regDisc.find(function (x) { return x.id === v; }); return d ? d.n : ''; }
+  var aulas = [], nomes = [];
+  sel.forEach(function (x) { var n = nomeDe(x.disc); if (!n) return; aulas.push({ n: n, dia: x.dia, ini: horaValida(x.ini), fim: horaValida(x.fim), sala: String(x.sala || '').trim() }); if (!nomes.some(function (m) { return norm(m) === norm(n); })) nomes.push(n); });
+  W.aulasLidas = aulas; W.leituraFeita = JSON.parse(JSON.stringify(lt));
+  W.discs = nomes.map(function (n) { return { n: n, on: true, g: '' }; }); W.discKey = chaveDisc(perfilW());
+  W.horarioLido = true; W.saltouHorario = false; W.erro = {};
+  UI.leitura = null; fechar();
+  W.passo = passos().indexOf('pronto'); render(); window.scrollTo(0, 0);
+  toast('Horário lido: ' + plural(aulas.length, 'aula', 'aulas') + ' e ' + plural(nomes.length, 'disciplina', 'disciplinas') + '.');
+}
 
 /* ---------- Modo foco ---------- */
 /* Só o cronómetro e as horas no ecrã. Se o aluno sai da Cumpre, esse tempo não conta. */
@@ -2111,9 +2128,11 @@ function sequencia() {
 
 /* ---------- Dados oficiais (carregados quando são precisos) ---------- */
 var DADOS = {};
+/* Muda sempre que as listas de escolas e cursos mudam, para nenhum telemóvel ficar com a lista antiga. */
+var VERSAO_DADOS = '2026-10-24b';
 function carregar(nome) {
   if (DADOS[nome]) return DADOS[nome];
-  DADOS[nome] = fetch('data/' + nome + '.json').then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
+  DADOS[nome] = fetch('data/' + nome + '.json?v=' + VERSAO_DADOS, { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (j) {
     if (nome === 'escolas') {
       j.lista = j.escolas.map(function (r) { return { id: r[0], n: r[1], m: r[2], d: r[3], lv: r[4], ch: r[5] ? r[5].split(',') : [], pc: r[6] ? r[6].split(',') : [], q: norm(r[1] + ' ' + r[2] + ' ' + j.distritos[r[3]]) }; });
     } else {
@@ -2331,7 +2350,9 @@ function chaveDisc(p) { return [p.nivel, p.ano, p.curso && p.curso.id, p.lingua2
 function passos() {
   var L = ['sobre', 'ano', 'escola'];
   if (W.nivel === 'S' || W.nivel === 'U') L.push('curso');
-  L.push('disciplinas', 'pronto');
+  if (!W.editar) L.push('horario');
+  if (W.editar || !W.horarioLido) L.push('disciplinas');
+  L.push('pronto');
   return L;
 }
 function aplicarSugestao() {
@@ -2343,7 +2364,7 @@ function aplicarSugestao() {
 function vRegisto() {
   if (W.passo >= 1) aplicarSugestao();
   var P = passos(), cur = P[W.passo] || 'sobre';
-  var corpo = { sobre: rSobre, ano: rAno, escola: rEscola, curso: rCurso, disciplinas: rDisciplinas, pronto: rPronto }[cur]();
+  var corpo = { sobre: rSobre, ano: rAno, escola: rEscola, curso: rCurso, horario: rHorario, disciplinas: rDisciplinas, pronto: rPronto }[cur]();
   var ultimo = cur === 'pronto';
   return '<div class="ob">' +
     asideRegisto(true) +
@@ -2518,6 +2539,23 @@ function rDisciplinas() {
     (W.discs.length ? '<div class="stack" id="lista-disc">' + W.discs.map(function (d, i) { return '<label class="check"><input type="checkbox" data-a="w-disc" data-i="' + i + '"' + (d.on ? ' checked' : '') + '><span>' + esc(d.n) + (d.g ? ' <span class="xs muted">· ' + esc(d.g) + '</span>' : '') + '</span></label>'; }).join('') + '</div>' : '') +
     '<div class="field"><label for="f-nd">' + (sup ? 'Nome da cadeira' : 'Juntar outra disciplina') + '</label><div class="row"><input class="input grow" id="f-nd" placeholder="' + (sup ? 'Ex.: Introdução às Probabilidades' : 'Ex.: Oficina de Teatro') + '"><button type="button" class="btn ghost" data-a="w-add-disc">' + ic('plus') + 'Juntar</button></div></div>' + erroDe('discs');
 }
+function regDiscDe(w) {
+  return disciplinasSugeridas({ nivel: w.nivel, ano: w.ano, curso: w.curso, lingua2: w.lingua2 }).map(function (d, i) { return { id: 'r' + i, n: d.n }; });
+}
+function rHorario() {
+  W.regDisc = regDiscDe(W);
+  var head = '<div class="stack"><h1>O teu horário</h1><p class="muted">Tira uma foto ao horário, ou escolhe o print ou o PDF que a escola te deu. Lemos as aulas e as disciplinas, e tu só confirmas.</p></div>';
+  if (W.horarioLido && W.aulasLidas) {
+    return head + '<div class="card stack"><p class="li-title">' + ic('check', 'sm') + ' Horário lido: ' + plural(W.aulasLidas.length, 'aula', 'aulas') + '</p>' +
+      '<div class="chips">' + W.discs.map(function (d) { return '<span class="chip" aria-pressed="true">' + esc(d.n) + '</span>'; }).join('') + '</div></div>' +
+      '<div class="row wrap"><button type="button" class="btn ghost" data-a="w-horario-rever">Ver e corrigir</button><button type="button" class="btn ghost" data-a="horario-foto">' + ic('camera', 'sm') + 'Ler outra foto</button></div>';
+  }
+  return head +
+    (podeLerHorario() ? '<button type="button" class="opcao destaque" data-a="horario-foto"><span class="tile-ico" style="background:var(--accent);color:var(--on-accent);width:52px;height:52px;border-radius:16px">' + ic('camera', 'lg') + '</span><span class="grow"><b>Tirar foto ou escolher ficheiro</b><span class="small sub">Foto, print ou PDF do horário. As disciplinas ficam logo feitas.</span></span>' + ic('arrowR') + '</button>' +
+      '<p class="xs muted">A foto só serve para ler o horário e não fica guardada.</p>' : '<div class="notice">' + ic('lock') + '<span>A leitura do horário não está disponível agora. Escolhe as disciplinas à mão e juntas o horário depois.</span></div>') +
+    erroDe('horario') +
+    '<button type="button" class="link-btn" data-a="w-saltar-horario" style="align-self:flex-start">Saltar este passo e escolher as disciplinas à mão</button>';
+}
 function perfilW() { return { nivel: W.nivel, ano: W.ano, curso: W.curso, lingua2: W.lingua2 }; }
 function rPronto() {
   var n = W.discs.filter(function (d) { return d.on; }).length;
@@ -2528,8 +2566,8 @@ function rPronto() {
       (W.curso ? '<dt>Curso</dt><dd>' + esc(W.curso.n) + (W.curso.grau ? ' · ' + esc(W.curso.grau) : '') + '</dd>' : '') +
       '<dt>Ano</dt><dd>' + (W.ano ? W.ano + '.º ano' : '') + ' · ' + NIVEIS[W.nivel] + '</dd>' +
       '<dt>Disciplinas</dt><dd>' + n + '</dd>' +
+      (W.aulasLidas && W.aulasLidas.length ? '<dt>Horário</dt><dd>' + plural(W.aulasLidas.length, 'aula', 'aulas') + '</dd>' : '') +
     '</dl>' +
-    (!W.editar && podeLerHorario() ? '<div class="notice">' + ic('camera') + '<span>A seguir, junta o teu horário: tiras uma foto ou escolhes o ficheiro, nós lemos as aulas e tu só confirmas.</span></div>' : '') +
     (cal ? '<div class="notice">' + ic('cal') + '<span>Pusemos no teu calendário as férias e o fim das aulas de 2026/27 do calendário escolar oficial.</span></div>' : '') +
     '<p class="xs muted" data-modo="curto">' + textoModo('curto') + '</p>';
 }
@@ -2564,6 +2602,8 @@ function validar() {
     }
     if (!e.curso && !W.curso) e.curso = 'Escolhe o teu curso.';
     else if (W.nivel === 'U' && !W.ano) e.ano = 'Escolhe o ano do curso.';
+  } else if (cur === 'horario') {
+    if (!W.horarioLido) e.horario = 'Junta o teu horário, ou carrega em "Saltar este passo".';
   } else if (cur === 'disciplinas') {
     if (!W.discs.some(function (d) { return d.on; })) e.discs = 'Escolhe pelo menos uma disciplina.';
   }
@@ -2590,7 +2630,11 @@ function concluirRegisto() {
   });
   ant.forEach(function (d) { if (!novas.includes(d) && (S.notas.some(function (x) { return x.disc === d.id; }) || S.avaliacoes.some(function (x) { return x.disc === d.id; }))) novas.push(d); });
   S.disciplinas = novas;
+  if (W.aulasLidas && W.aulasLidas.length) {
+    S.aulas = W.aulasLidas.map(function (a) { var d = S.disciplinas.find(function (x) { return norm(x.n) === norm(a.n); }); return d ? { id: uid(), disc: d.id, dia: a.dia, ini: a.ini, fim: a.fim, sala: a.sala } : null; }).filter(Boolean);
+  }
   if (novo) dar(150, 'boas-vindas', true);
+  if (novo && S.aulas.length) premio('horario', 30, 'horário criado');
   var manual = escolaManual(W);
   W = null;
   if (novo) setTimeout(function () { if (presencaDiaria() && !aEditar() && !$('#layer').innerHTML) rerender(); }, 3400);
@@ -2600,7 +2644,6 @@ function concluirRegisto() {
   window.scrollTo(0, 0);
   if (!novo) toast('Dados atualizados.');
   if (manual) enviarEscolaManual(manual);
-  if (novo && podeLerHorario() && !S.aulas.length) setTimeout(function () { if (!W && !$('#layer').innerHTML) janHorarioInicio(); }, 600);
 }
 function janHorarioInicio() {
   abrir(cab('Junta já o teu horário', 'Com as aulas, a Cumpre diz-te todos os dias o que estudar.') +
@@ -3068,6 +3111,8 @@ var A = {
   'w-curso-outro': function () { W.cursoOutro = true; W.curso = null; W.ano = null; render(); var n = $('#f-cn'); if (n) n.focus(); },
   'w-curso-lista': function () { W.cursoOutro = false; W.curso = null; W.cursoG = ''; render(); },
   'w-disc': function (el) { W.discs[Number(el.dataset.i)].on = el.checked; },
+  'w-saltar-horario': function () { W.saltouHorario = true; W.horarioLido = false; W.aulasLidas = null; W.discs = null; W.erro = {}; W.passo = passos().indexOf('disciplinas'); render(); window.scrollTo(0, 0); },
+  'w-horario-rever': function () { if (!W.leituraFeita) return; W.regDisc = regDiscDe(W); UI.leitura = JSON.parse(JSON.stringify(W.leituraFeita)); janConfirmarHorario(); },
   'w-add-disc': function () {
     var i = $('#f-nd'), v = (i.value || '').trim();
     if (!v) { i.focus(); return; }
