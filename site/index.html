@@ -2117,7 +2117,7 @@ function carregar(nome) {
     if (nome === 'escolas') {
       j.lista = j.escolas.map(function (r) { return { id: r[0], n: r[1], m: r[2], d: r[3], lv: r[4], ch: r[5] ? r[5].split(',') : [], pc: r[6] ? r[6].split(',') : [], q: norm(r[1] + ' ' + r[2] + ' ' + j.distritos[r[3]]) }; });
     } else {
-      j.unid = j.unidades.map(function (u) { var i = j.instituicoes[u[2]] || ['', '', '']; return { id: u[0], n: u[1], inst: u[2], in: i[0], nat: i[1], tipo: i[2], q: norm(u[1] + ' ' + i[0]) }; });
+      j.unid = j.unidades.map(function (u) { var i = j.instituicoes[u[2]] || ['', '', '']; return { id: u[0], n: u[1], inst: u[2], in: i[0], nat: i[1], tipo: i[2], q: norm(u[1] + ' ' + i[0] + ' ' + (i[3] || '') + ' ' + (u[3] || '')) }; });
     }
     return j;
   });
@@ -2136,6 +2136,7 @@ function render() {
   if (ONLINE && AUTH.link) { app.innerHTML = vLink(); return; }
   if (ONLINE && (!sessao || AUTH.carregando || AUTH.erroCarregar)) { app.innerHTML = sessao && (AUTH.carregando || AUTH.erroCarregar) ? vCarregar() : (AUTH.carregando ? vCarregar() : vAuth()); return; }
   if (!S.perfil || W) { if (!W) W = novoRegisto(); app.innerHTML = vRegisto(); posRegisto(); return; }
+  if (!escolaRevista) { escolaRevista = true; setTimeout(reverEscolaGuardada, 1200); }
   var y = window.scrollY;
   var body = '';
   if (UI.view === 'hoje') body = vHoje();
@@ -2196,7 +2197,7 @@ function asideRegisto(registo) {
     big: W && W.editar ? 'Os teus dados da escola.' : 'Vamos preparar a tua Cumpre.',
     sub: 'Escolhes o ano, a escola e o curso. A partir daí, a Cumpre prepara as disciplinas e o teu estudo.',
     li: ['Escolas e cursos das listas oficiais de todo o país', 'As disciplinas do teu ano aparecem sozinhas', 'Depois juntas o horário e as datas dos testes'],
-    pe: 'Escolas: InfoEscolas (DGEEC), fevereiro de 2025. Cursos superiores: InfoCursos 2026 (DGEEC).'
+    pe: 'Escolas: InfoEscolas (DGEEC), fevereiro de 2025. Cursos superiores: InfoCursos 2026 (DGEEC) e registo da DGES, outubro de 2026.'
   } : {
     big: 'Cumpre o que tens para estudar.',
     sub: 'O horário, os testes e os trabalhos num só sítio. Todos os dias sabes o que estudar para chegares ao teste preparado.',
@@ -2334,6 +2335,7 @@ function passos() {
   return L;
 }
 function aplicarSugestao() {
+  return; // o aluno escolhe sempre o nível e o ano
   if (W.nivel || !W.nasc) return;
   var sug = anoSugerido(W.nasc);
   if (sug && sug.nivel) { W.nivel = sug.nivel; if (sug.nivel !== 'U') W.ano = sug.ano; }
@@ -2361,7 +2363,7 @@ function inv(k) { return W.erro[k] ? ' aria-invalid="true" aria-describedby="e-'
 function rSobre() {
   var id = idade(W.nasc), menor = id !== null && id < 13 && id >= 5;
   var maxD = today(), minD = (new Date().getFullYear() - 90) + '-01-01';
-  return '<div class="stack"><h1>' + (W.editar || ONLINE ? 'Os teus dados' : 'Cria a tua conta') + '</h1><p class="muted">Com a tua data de nascimento já sugerimos o teu ano. Depois só confirmas.</p></div>' +
+  return '<div class="stack"><h1>' + (W.editar || ONLINE ? 'Os teus dados' : 'Cria a tua conta') + '</h1><p class="muted">A seguir escolhes o teu ano, a escola e as disciplinas.</p></div>' +
     '<div class="stack">' +
       '<div class="field"><label for="f-nome">Nome</label><input class="input" id="f-nome" data-w="nome" autocomplete="name" placeholder="O teu nome e apelido" value="' + esc(W.nome) + '"' + inv('nome') + '>' + erroDe('nome') + '</div>' +
       (ONLINE ? '<div class="field"><label for="f-email">Email</label><input class="input" id="f-email" type="email" readonly value="' + esc(sessao ? sessao.email : W.email) + '"><p class="hint">É o email com que entras. <button type="button" class="link-btn" data-a="sair">Não és tu? Sai aqui</button></p></div>' :
@@ -2375,7 +2377,7 @@ function rSobre() {
     '</div>';
 }
 function rAno() {
-  var sug = anoSugerido(W.nasc) || {};
+  var sug = {};
   var anos = ANOS[W.nivel] || [];
   return '<div class="stack"><h1>Em que ano estás?</h1><p class="muted">' + (sug.nivel ? 'Pela tua idade, marcámos ' + (sug.nivel === 'U' ? 'o ensino superior' : 'o ' + sug.ano + '.º ano') + '. Muda se não for o teu caso.' : 'Escolhe o teu nível de ensino.') + '</p></div>' +
     '<fieldset class="stack" style="border:0;padding:0;margin:0;min-width:0"><legend class="label" style="margin-bottom:8px">Nível de ensino</legend><div class="chips">' +
@@ -2401,7 +2403,7 @@ function rEscola() {
       '<button type="button" class="link-btn" data-a="w-lista" style="align-self:flex-start">Voltar à lista oficial</button></div>';
   }
   return head + '<div class="stack">' +
-    '<div class="search">' + ic('search') + '<input class="input" id="f-q" data-w="q" type="search" autocomplete="off" placeholder="' + (sup ? 'Ex.: Politécnico de Leiria, Faculdade de Direito' : 'Ex.: Maria Lamas, Torres Novas') + '" value="' + esc(W.q) + '" aria-label="Procurar escola"></div>' +
+    '<div class="search">' + ic('search') + '<input class="input" id="f-q" data-w="q" type="search" autocomplete="off" placeholder="' + (sup ? 'Ex.: Universidade de Leiria, Faculdade de Direito' : 'Ex.: Maria Lamas, Torres Novas') + '" value="' + esc(W.q) + '" aria-label="Procurar escola"></div>' +
     (sup ? '' : '<div class="field"><label for="f-dist">Distrito</label><select class="input" id="f-dist" data-w="dist"><option value="">Todos os distritos</option>' + DISTRITOS_OPC() + '</select></div>') +
     '<p class="xs muted" id="res-info">A carregar a lista oficial…</p>' +
     '<div class="pick-list" id="res" role="list"></div>' + erroDe('escola') +
@@ -2455,6 +2457,7 @@ function rCurso() {
     '<div id="anos-u"></div>' + erroDe('ano');
 }
 function montarCursos() {
+  if (W.nivel === 'U' && ((W.escola && W.escola.custom) || W.cursoOutro)) { montarAnosU(); return; }
   var box = $('#cursos');
   if (!box) return;
   if (W.nivel === 'S') {
@@ -2526,6 +2529,7 @@ function rPronto() {
       '<dt>Ano</dt><dd>' + (W.ano ? W.ano + '.º ano' : '') + ' · ' + NIVEIS[W.nivel] + '</dd>' +
       '<dt>Disciplinas</dt><dd>' + n + '</dd>' +
     '</dl>' +
+    (!W.editar && podeLerHorario() ? '<div class="notice">' + ic('camera') + '<span>A seguir, junta o teu horário: tiras uma foto ou escolhes o ficheiro, nós lemos as aulas e tu só confirmas.</span></div>' : '') +
     (cal ? '<div class="notice">' + ic('cal') + '<span>Pusemos no teu calendário as férias e o fim das aulas de 2026/27 do calendário escolar oficial.</span></div>' : '') +
     '<p class="xs muted" data-modo="curto">' + textoModo('curto') + '</p>';
 }
@@ -2587,6 +2591,7 @@ function concluirRegisto() {
   ant.forEach(function (d) { if (!novas.includes(d) && (S.notas.some(function (x) { return x.disc === d.id; }) || S.avaliacoes.some(function (x) { return x.disc === d.id; }))) novas.push(d); });
   S.disciplinas = novas;
   if (novo) dar(150, 'boas-vindas', true);
+  var manual = escolaManual(W);
   W = null;
   if (novo) setTimeout(function () { if (presencaDiaria() && !aEditar() && !$('#layer').innerHTML) rerender(); }, 3400);
   guardar();
@@ -2594,6 +2599,39 @@ function concluirRegisto() {
   render();
   window.scrollTo(0, 0);
   if (!novo) toast('Dados atualizados.');
+  if (manual) enviarEscolaManual(manual);
+  if (novo && podeLerHorario() && !S.aulas.length) setTimeout(function () { if (!W && !$('#layer').innerHTML) janHorarioInicio(); }, 600);
+}
+function janHorarioInicio() {
+  abrir(cab('Junta já o teu horário', 'Com as aulas, a Cumpre diz-te todos os dias o que estudar.') +
+    '<div class="stack"><ol class="small" style="margin:0;padding-left:20px;display:grid;gap:6px"><li>Tira uma foto ao horário, ou escolhe o print ou o PDF que a escola te deu.</li><li>Nós lemos as aulas, as horas e as salas.</li><li>Tu confirmas e corriges o que for preciso antes de guardar.</li></ol>' +
+    '<p class="xs muted">A foto só serve para ler o horário e não fica guardada.</p>' +
+    '<button class="btn lg" data-a="horario-foto">' + ic('camera', 'sm') + 'Tirar foto ou escolher ficheiro</button>' +
+    '<button class="btn ghost" data-a="fechar">Faço isto depois</button></div>');
+}
+/* Escola ou curso escritos à mão: ficam numa lista para confirmarmos e juntarmos à lista oficial. */
+function escolaManual(w) {
+  if (!w) return null;
+  var e = w.escola && w.escola.custom, c = w.nivel === 'U' && w.curso && w.curso.id === 'outro';
+  if (!e && !c) return null;
+  return { nivel: w.nivel, ano: w.ano || null, escola: w.escola ? w.escola.n : '', localidade: e ? (w.escola.m || '') : '', escolaEscrita: !!e,
+    instituicao: !e && w.escola ? (w.escola.sub || '') : '', curso: w.curso ? w.curso.n : '', grau: w.curso && w.curso.grau ? w.curso.grau : '', cursoEscrito: !!c };
+}
+function enviarEscolaManual(x) {
+  if (!ONLINE || !supa || !sessao) return;
+  supa.from('escolas_manuais').insert({ user_id: sessao.id, dados: x }).then(null, function () {});
+}
+/* Quando a lista oficial muda (ex.: o Politécnico de Leiria passou a Universidade de Leiria e Oeste), atualiza o nome guardado. */
+var escolaRevista = false;
+function reverEscolaGuardada() {
+  var e = S.perfil && S.perfil.escola;
+  if (!e || e.custom || !e.id) return;
+  carregar(S.perfil.nivel === 'U' ? 'superior' : 'escolas').then(function (j) {
+    var n, sub, mud = false;
+    if (S.perfil.nivel === 'U') { var u = j.unid.find(function (x) { return x.id === e.id; }); if (!u) return; n = u.n; sub = u.n === u.in ? u.nat + ' · ' + u.tipo : u.in; if (e.n !== n || e.sub !== sub) { e.n = n; e.sub = sub; e.inst = u.inst; mud = true; } }
+    else { var s2 = j.lista.find(function (x) { return x.id === e.id; }); if (!s2) return; n = s2.n; sub = s2.m + ' · ' + j.distritos[s2.d]; if (e.n !== n || e.m !== sub) { e.n = n; e.m = sub; mud = true; } }
+    if (mud) { guardar(); if (!W && !aEditar() && !$('#layer').innerHTML) rerender(); }
+  }).catch(function () {});
 }
 function posRegisto() {
   var cur = passos()[W.passo];
@@ -2881,7 +2919,7 @@ function vPerfil() {
       '<button class="btn ghost sm" data-a="editar-dados">' + ic('edit', 'sm') + (ONLINE ? 'Mudar nome ou data' : 'Mudar nome, email ou data') + '</button>' +
       (ONLINE ? '<button class="btn ghost sm" data-a="nova-passe">' + ic('lock', 'sm') + 'Mudar palavra-passe</button><button class="btn ghost sm" data-a="sair">Terminar sessão</button>' : '') +
       '<button class="btn danger sm" data-a="apagar-tudo">' + ic('trash', 'sm') + (ONLINE ? 'Apagar a minha conta' : 'Apagar os meus dados') + '</button></section>' +
-      '<p class="xs muted">Escolas: InfoEscolas (DGEEC), fevereiro de 2025, Portugal continental. Cursos superiores: InfoCursos 2026 (DGEEC). Calendário: calendário escolar 2026/27 do continente.</p></div></div>';
+      '<p class="xs muted">Escolas: InfoEscolas (DGEEC), fevereiro de 2025, Portugal continental. Cursos superiores: InfoCursos 2026 (DGEEC), com os nomes e cursos atualizados pelo registo da DGES em outubro de 2026. Calendário: calendário escolar 2026/27 do continente.</p></div></div>';
 }
 
 /* ---------- Janelas ---------- */
@@ -2998,7 +3036,7 @@ var A = {
   nav: function (el) { var v = el.dataset.v; fechar(); ir(v); },
   'ob-voltar': function () { if (W.passo > 0) { W.passo--; W.erro = {}; render(); window.scrollTo(0, 0); } },
   'ob-cancelar': function () { W = null; render(); },
-  'w-nivel': function (el) { var k = el.dataset.k; if (W.nivel !== k) { W.nivel = k; W.ano = null; W.escola = null; W.curso = null; W.q = ''; } W.erro = {}; var sug = anoSugerido(W.nasc); if (sug && sug.nivel === k && k !== 'U') W.ano = sug.ano; render(); },
+  'w-nivel': function (el) { var k = el.dataset.k; if (W.nivel !== k) { W.nivel = k; W.ano = null; W.escola = null; W.curso = null; W.q = ''; } W.erro = {}; render(); },
   'w-ano': function (el) { W.ano = Number(el.dataset.k); W.erro.ano = ''; if (passos()[W.passo] === 'curso') { montarAnosU(); return; } var nv = nivelDoAno(W.ano); if (W.nivel !== 'U' && nv !== W.nivel) W.nivel = nv; render(); },
   'w-escola': function (el) {
     var id = el.dataset.id;

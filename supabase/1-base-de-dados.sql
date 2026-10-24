@@ -175,3 +175,22 @@ begin
     revoke execute on function public.rls_auto_enable() from public, anon, authenticated;
   end if;
 end $$;
+
+-- 9. Escolas e cursos escritos à mão no registo (não estavam na lista oficial).
+--    Uma verificação diária procura informação sobre cada um, corrige a lista oficial e marca o estado aqui.
+create table if not exists public.escolas_manuais (
+  id bigint generated always as identity primary key,
+  user_id uuid not null references auth.users (id) on delete cascade,
+  dados jsonb not null,
+  estado text not null default 'por verificar',
+  nota text,
+  criado timestamptz not null default now(),
+  verificado timestamptz
+);
+create index if not exists escolas_manuais_por_verificar on public.escolas_manuais (criado) where estado = 'por verificar';
+alter table public.escolas_manuais enable row level security;
+revoke all on public.escolas_manuais from anon, authenticated;
+grant insert on public.escolas_manuais to authenticated;
+drop policy if exists "juntar a minha" on public.escolas_manuais;
+create policy "juntar a minha" on public.escolas_manuais
+  for insert to authenticated with check ((select auth.uid()) = user_id);
