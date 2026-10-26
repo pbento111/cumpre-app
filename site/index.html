@@ -149,7 +149,7 @@ textarea.input { min-height: 120px; resize: vertical; line-height: 1.55; }
 .bar { height: 8px; border-radius: 999px; background: var(--sand); overflow: hidden; }
 .bar > i { display: block; height: 100%; border-radius: inherit; background: var(--heading); }
 .hero .bar { background: var(--hero-track); }
-.hero .bar > i { background: var(--accent); }
+.hero .bar > i { background: var(--accent-hero, var(--accent)); }
 .list { display: flex; flex-direction: column; }
 .list > * + * { border-top: 1px solid var(--line); }
 .li { display: flex; align-items: center; gap: 12px; padding: 12px 0; min-width: 0; }
@@ -339,6 +339,33 @@ details.more > summary::-webkit-details-marker { display: none; }
 :root[data-theme="light"][data-paleta="rosa"] { --bg: #FFFFFF; --sand: #F5F4F5; --line: #E9E7EA; --line-strong: #8E8A90; --ink: #18161A; --muted: #57535A; --heading: #1C1A1E; --btn: #1C1A1E; --btn-ink: #FFFFFF; --btn-hover: #333036; --accent: #FF7EB6; --on-accent: #1C1A1E; --soft: #FFE6F1; --on-soft: #7A1F4A; --hero: #1C1A1E; --hero-ink: #FFFFFF; --hero-muted: #DAD6DC; --hero-track: #3A363D; --focus: #1C1A1E; --c1: #FFE6F1; --c2: #FFF3C4; --c3: #E3F1FF; --c4: #F2F1F3; --c5: #E2F5EA; --c6: #EEE8FF; }
 @media (prefers-color-scheme: dark) { :root[data-paleta="rosa"]:not([data-theme="light"]) { --accent: #FF7EB6; --on-accent: #111111; --focus: #FF7EB6; } }
 :root[data-theme="dark"][data-paleta="rosa"] { --accent: #FF7EB6; --on-accent: #111111; --focus: #FF7EB6; }
+/* Ranks: cartão, requisitos, cores e emblemas */
+.btn.brilho { box-shadow: 0 10px 26px -8px var(--rank-c, transparent); }
+.cartao { position: relative; overflow: hidden; border-radius: 20px; padding: 18px 20px; aspect-ratio: 1.586; width: 100%; max-width: 380px; display: flex; flex-direction: column; justify-content: space-between; gap: 8px; color: var(--t); background: linear-gradient(135deg, var(--f) 0%, var(--f) 42%, var(--c) 125%); box-shadow: 0 16px 36px -14px var(--c), inset 0 0 0 1px rgba(255, 255, 255, .2); }
+.cartao::after { content: ''; position: absolute; inset: -40% -60%; background: linear-gradient(115deg, transparent 42%, rgba(255, 255, 255, .2) 50%, transparent 58%); pointer-events: none; }
+.cartao > * { position: relative; z-index: 1; }
+.cartao-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cartao-marca { font-family: var(--display); font-weight: 700; font-size: 18px; letter-spacing: -.02em; }
+.cartao-rank { font-weight: 700; font-size: 12px; letter-spacing: .16em; }
+.cartao-nome { display: block; font-family: var(--display); font-size: 26px; font-weight: 600; line-height: 1.1; overflow-wrap: anywhere; }
+.cartao-id { font-size: 15px; }
+.cartao-baixo { display: flex; flex-direction: column; gap: 2px; font-size: 12px; letter-spacing: .04em; }
+.req { display: grid; grid-template-columns: 22px 1fr auto; gap: 4px 10px; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.req:last-child { border-bottom: 0; }
+.req .bar { grid-column: 2 / 4; height: 6px; }
+.req-ok { width: 22px; height: 22px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--sand); color: var(--muted); }
+.req-ok.sim { background: var(--accent); color: var(--on-accent); }
+.cores-rank { display: flex; flex-wrap: wrap; gap: 8px; }
+.cor-rank { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px 0 8px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); font-weight: 600; font-size: 14px; }
+.cor-rank[aria-pressed="true"] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+.cor-rank i { width: 22px; height: 22px; border-radius: 999px; display: block; background: linear-gradient(135deg, var(--f) 50%, var(--c) 50%); }
+.emb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); gap: 10px; }
+.emb { border: 1px solid var(--line); border-radius: var(--r); padding: 12px; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.emb-ico { width: 34px; height: 34px; border-radius: 999px; display: inline-flex; align-items: center; justify-content: center; background: var(--sand); color: var(--muted); }
+.emb.on .emb-ico { background: var(--accent); color: var(--on-accent); }
+.emb-estrelas { color: var(--heading); letter-spacing: 2px; font-size: 14px; }
+.emb-estrelas i { font-style: normal; color: var(--line-strong); opacity: .45; }
+.foco-pergunta { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 18px; }
 .swatches { display: flex; gap: 6px; }
 .swatches i { width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line); display: block; }
 .aviso { align-items: center; flex-wrap: wrap; }
@@ -369,9 +396,9 @@ details.more > summary::-webkit-details-marker { display: none; }
 .foco-disc, .foco-sub, .foco-dica { color: var(--hero-muted); }
 .foco-centro { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
 .foco-tempo { font-family: var(--display); font-size: clamp(76px, 24vw, 168px); font-weight: 600; letter-spacing: -0.04em; line-height: 1; font-variant-numeric: tabular-nums; color: var(--hero-ink); }
-.foco-feito { font-weight: 700; color: var(--accent); font-size: 18px; }
+.foco-feito { font-weight: 700; color: var(--accent-hero, var(--accent)); font-size: 18px; }
 .foco-barra { width: min(420px, 80vw); height: 8px; border-radius: 99px; background: var(--hero-track); overflow: hidden; margin: 18px 0 6px; }
-.foco-barra i { display: block; height: 100%; background: var(--accent); border-radius: 99px; transition: width .6s linear; }
+.foco-barra i { display: block; height: 100%; background: var(--accent-hero, var(--accent)); border-radius: 99px; transition: width .6s linear; }
 .foco-baixo { display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: 460px; }
 .foco-acoes { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
 .foco-min { color: var(--hero-muted); }
@@ -646,7 +673,7 @@ function discMatch(it) {
 var KEY = 'cumpre.estudo.v1';
 function estadoVazio() {
   return { v: 1, upd: 0, perfil: null, disciplinas: [], avaliacoes: [], aulas: [], tarefas: [], notas: [], sessoes: [], timer: null,
-    pontos: { saldo: 0, ganho: 0, log: [] }, diario: {}, atividade: {}, resgates: {}, lidos: {}, premios: {}, calEscola: null, medias: null, pedidos: [] };
+    pontos: { saldo: 0, ganho: 0, log: [] }, diario: {}, atividade: {}, resgates: {}, lidos: {}, premios: {}, calEscola: null, medias: null, pedidos: [], conta: null };
 }
 var S = estadoVazio();
 var modo = 'dispositivo';
@@ -767,7 +794,7 @@ function puxarRemoto() {
 function aplicarRemoto(d) {
   if (!AUTH.carregando && aEditar()) { remotoPendente = d; return; }
   remotoPendente = null;
-  S = normalizar(JSON.parse(JSON.stringify(d))); gravarLocal();
+  S = normalizar(JSON.parse(JSON.stringify(d))); espelharConta(); gravarLocal();
   if (W && !W.editar) W = null;
   if (!AUTH.carregando) render();
 }
@@ -833,7 +860,9 @@ function carregarConta() {
     if (!S.perfil) W = novoRegisto();
     retomarFoco();
     render(); window.scrollTo(0, 0);
+    aplicarCorRank();
     if (presencaDiaria()) rerender();
+    contaArrancar();
     ligarTempoReal();
     if (lido) { sincronizarCalendario().catch(function () {}); sincronizarPedidos(); }
     if (verPedidos()) rerender();
@@ -847,6 +876,7 @@ function sairLocal(trocar) {
   try { localStorage.removeItem(chaveLocal); } catch (e) {}
   var email = sessao ? sessao.email : '';
   sessao = null; chaveLocal = KEY; S = estadoVazio(); W = null; remotoLido = false; porEnviar = false; remotoPendente = null; urlsSupa = {};
+  CONTA = null; FILA = []; idTentado = false; presencaPedida = ''; aplicarCorRank();
   UI.view = 'hoje';
   if (trocar) return;
   AUTH = novoAuth('entrar'); AUTH.email = email;
@@ -1591,6 +1621,7 @@ function vFoco() {
   return '<div class="foco" role="dialog" aria-modal="true" aria-label="Modo foco">' +
     '<div class="foco-topo"><span class="foco-hora num" data-hora>' + agoraHM() + '</span><span class="small foco-disc">' + esc(discNome(T.disc)) + ' · ' + (T.dur || 25) + ' min</span></div>' +
     '<div class="foco-centro">' + (fim ? '<p class="foco-feito">Sessão concluída</p>' : '') + '<p class="foco-tempo num" data-foco-tempo>' + (fim ? mmss(tot) : tempoTimer()) + '</p>' +
+      (T.pergunta && !T.pausa && !fim ? '<div class="foco-pergunta" role="alertdialog" aria-label="Ainda estás a estudar?"><p class="foco-feito">Ainda estás a estudar?</p><button class="btn on-hero lg" data-a="foco-sim">Sim, continuar</button><p class="xs foco-sub">Se não responderes em 2 minutos, a sessão fica em pausa.</p></div>' : '') +
       '<div class="foco-barra" aria-hidden="true"><i data-foco-barra style="width:' + pct + '%"></i></div>' +
       '<p class="small foco-sub" data-foco-sub>' + (T.pausa ? 'Em pausa. A pausa não conta para os pontos.' : fim ? 'Boa! Faz uma pausa de 5 minutos antes da próxima.' : 'Se saíres da Cumpre, este tempo não conta.') + '</p></div>' +
     '<div class="foco-baixo"><div class="foco-acoes">' + acoes + '</div>' +
@@ -1605,8 +1636,8 @@ function renderFoco() {
 }
 document.addEventListener('visibilitychange', function () {
   var T = S.timer; if (!T) return;
-  if (document.visibilityState === 'hidden') { if (!T.saiu && !T.pausa) { T.saiu = Date.now(); gravarLocal(); } return; }
-  if (T.saiu) { retomarFoco(); gravarLocal(); renderFoco(); }
+  if (document.visibilityState === 'hidden') { if (!T.saiu && !T.pausa) { focoSinal(false); T.saiu = Date.now(); gravarLocal(); } return; }
+  if (T.saiu) { retomarFoco(); focoSinal(true); gravarLocal(); renderFoco(); }
   if (!UI.focoMin) pedirFoco();
 });
 document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'visible' && S.perfil && !W && (!ONLINE || (sessao && !AUTH.carregando)) && presencaDiaria() && !aEditar() && !$('#layer').innerHTML) rerender(); });
@@ -1638,6 +1669,13 @@ function verPlanoCumprido() {
   if (L.length && L.every(function (x) { return x.hoje >= x.alvo; })) premioDia('plano', 15, 'estudo de hoje cumprido');
 }
 function ptsTemas(a, n) {
+  if (srvOn()) {
+    var novos = (a.temas || []).slice(-n), tot = 0;
+    novos.forEach(function (t) { objetivo('tema:' + t.id); });
+    novos.reduce(function (pr, t) { return pr.then(function () { return rpc('pontos_ganhar', { p_tipo: 'temas-teste', p_ref: a.id, p_sub: t.id }).then(function (c) { tot += c.dado || 0; aplicarConta(c); }); }); }, Promise.resolve())
+      .then(function () { if (tot) toast('+' + tot + ' pontos · ' + plural(n, 'tema', 'temas') + ' de ' + discNome(a.disc)); }, function () {});
+    return;
+  }
   var ja = a.ptsTemas || 0, d = Math.min(n * 5, 25 - ja);
   if (d > 0) { a.ptsTemas = ja + d; dar(d, plural(n, 'tema', 'temas') + ' de ' + discNome(a.disc)); }
 }
@@ -1834,10 +1872,7 @@ var PALETAS = [
   { k: 'rosa', n: 'Grafite e rosa', d: 'Cinza-escuro e rosa', c: ['#1C1A1E', '#FF7EB6'] }
 ];
 var CUSTO_PALETA = 300, CUSTO_PROTECAO = 150, MAX_PROTECOES = 2, CUSTO_EXPLICACAO = 3000, DIAS_PEDIDO = 30;
-function aplicarPaleta() {
-  var k = (S.perfil && S.perfil.prefs && S.perfil.prefs.paleta) || '';
-  if (k) document.documentElement.setAttribute('data-paleta', k); else document.documentElement.removeAttribute('data-paleta');
-}
+function aplicarPaleta() { aplicarCorRank(); }
 function temPaleta(k) { return !k || !!S.resgates['paleta-' + k]; }
 function gastar(n, motivo) { S.pontos.saldo -= n; S.pontos.log.unshift({ t: Date.now(), n: -n, m: motivo }); S.pontos.log = S.pontos.log.slice(0, 200); }
 function devolver(n, motivo) { S.pontos.saldo += n; S.pontos.log.unshift({ t: Date.now(), n: n, m: motivo }); S.pontos.log = S.pontos.log.slice(0, 200); }
@@ -1848,7 +1883,8 @@ function verPedidos() {
   (S.pedidos || []).forEach(function (x) {
     if (x.tipo !== 'explicacao' || x.devolvido) return;
     if ((x.estado === 'à procura' && Date.now() - x.em > DIAS_PEDIDO * 86400000) || x.estado === 'sem explicador') {
-      x.estado = 'sem explicador'; x.devolvido = true; devolver(CUSTO_EXPLICACAO, 'explicação sem explicador: pontos devolvidos'); mudou = true;
+      x.estado = 'sem explicador'; x.devolvido = true; mudou = true;
+      if (srvOn()) chamar('loja_devolver', { p_pid: x.id }); else devolver(CUSTO_EXPLICACAO, 'explicação sem explicador: pontos devolvidos');
     }
   });
   if (mudou) { guardar(); setTimeout(function () { toast('Ainda não arranjámos explicador: devolvemos os teus ' + fmtN(CUSTO_EXPLICACAO) + ' pontos.'); }, 1500); }
@@ -1877,7 +1913,11 @@ function cartaoPaleta(p) {
 }
 function vLojaExtras() {
   return '<section class="stack"><h2>Explicações</h2><div class="grid2">' + cartaoExplicacao() + '</div></section>' +
-    '<section class="stack"><h2>Para a tua app</h2><div class="grid2">' + cartaoProtecao() + PALETAS.map(cartaoPaleta).join('') + '</div></section>';
+    '<section class="stack"><h2>Para a tua app</h2><div class="grid2">' + cartaoProtecao() + cartaoCores() + '</div></section>';
+}
+function cartaoCores() {
+  return '<article class="card item"><div class="row between wrap"><span class="pill sand">Cores</span></div><h3>As cores vêm do teu rank</h3><p class="small muted">Os temas de cores saíram da loja: agora cada rank tem as suas cores, e ganha-se a estudar. Quem tinha temas recebeu os pontos de volta.</p>' +
+    '<div class="row between" style="margin-top:auto;padding-top:6px"><span class="cost">' + (ONLINE ? esc(rankInfo(CONTA ? CONTA.rank : 0).n) : 'Na app online') + '</span>' + (ONLINE ? '<button class="btn ghost sm" data-a="nav" data-v="progresso">Ver o meu rank</button>' : '') + '</div></article>';
 }
 function vLojaBreve() {
   return '<section class="stack"><h2>Brevemente</h2><div class="grid2">' + [['Cumpre+ durante 1 mês', 'O plano com mais resumos, testes e ajuda nas dúvidas.'], ['Descontos em explicações', 'Preços especiais com os explicadores parceiros.'], ['Material escolar', 'Com papelarias parceiras perto de ti.']].map(function (x) {
@@ -2098,7 +2138,15 @@ function nivelPontos() { var g = S.pontos.ganho; return { n: 1 + Math.floor(g / 
 function premio(chave, n, motivo, semLimite) {
   if (S.premios[chave]) return 0;
   S.premios[chave] = 1;
+  if (srvOn()) { var t = tipoPremio(chave); if (t) ganhar(t[0], t[1], null, n, motivo); return t ? n : 0; }
   return dar(n, motivo, semLimite !== false);
+}
+/* Prémios únicos e o tipo que o servidor conhece. A primeira sessão em foco e a sequência, o servidor dá sozinho. */
+function tipoPremio(k) {
+  if (['horario', 'calendario', 'lembretes', 'foto'].indexOf(k) >= 0) return [k, null];
+  if (/^media/.test(k)) return ['media', k];
+  if (/^plano-/.test(k)) return ['plano', null];
+  return null;
 }
 function premioDia(k, n, motivo) { return premio(k + '-' + today(), n, motivo, false); }
 /* Abrir a Cumpre conta para a sequência. Uma proteção salva um dia falhado. */
@@ -2106,6 +2154,12 @@ function presencaDiaria() {
   if (!S.perfil || W) return;
   var d = today();
   if (S.atividade[d]) return;
+  if (srvOn()) {
+    S.atividade[d] = 1;
+    var ks0 = Object.keys(S.atividade).sort(); while (ks0.length > 400) delete S.atividade[ks0.shift()];
+    guardar(); presencaPedida = d; chamar('presenca', {}, avisoPresenca);
+    return true;
+  }
   var ontem = addDays(d, -1), usou = false;
   if (!S.atividade[ontem] && S.atividade[addDays(d, -2)] && (S.pontos.protecoes || 0) > 0) { S.atividade[ontem] = 'p'; S.pontos.protecoes--; usou = true; }
   S.atividade[d] = 1;
@@ -2120,10 +2174,212 @@ function presencaDiaria() {
 function marcarAtividade() { presencaDiaria(); }
 function proximoMarco(st) { var m = MARCOS.find(function (x) { return x[0] > st; }); return m || [Math.floor(st / 30) * 30 + 30, 250]; }
 function sequencia() {
+  if (srvOn() && CONTA) return CONTA.seq || 0;
   var d = today(), n = 0;
   if (!S.atividade[d]) d = addDays(d, -1);
   while (S.atividade[d]) { n++; d = addDays(d, -1); }
   return n;
+}
+
+
+/* ---------- Ranks, pontos e horas contados no servidor (versão online) ---------- */
+/* Na versão online os pontos, as horas de foco, os objetivos e o rank vivem no Supabase (3-ranks-e-pontos.sql):
+   a app pede, o servidor decide quanto dá. S.pontos fica só como cópia para mostrar. */
+var RANKS = [
+  { n: 'Grafite', f: '#3F3F46', c: '#D4D4D8', t: '#FFFFFF', h: 0, o: 0, custo: 0 },
+  { n: 'Bronze', f: '#8C4A22', c: '#D9A27A', t: '#FFFFFF', h: 5, o: 3, custo: 200 },
+  { n: 'Prata', f: '#5E6B78', c: '#C9D2DB', t: '#FFFFFF', h: 20, o: 10, custo: 600 },
+  { n: 'Ouro', f: '#B8860B', c: '#F2D372', t: '#111111', h: 50, o: 25, custo: 1200 },
+  { n: 'Platina', f: '#2E6F73', c: '#A7D8D6', t: '#FFFFFF', h: 100, o: 50, custo: 2000 },
+  { n: 'Diamante', f: '#2F5BEA', c: '#A9C2FF', t: '#FFFFFF', h: 180, o: 90, custo: 3000 },
+  { n: 'Mentor', f: '#6D28D9', c: '#C4B5FD', t: '#FFFFFF', h: 300, o: 150, custo: 4500 }
+];
+var ROMANOS = ['I', 'II', 'III', 'IV', 'V'];
+var CONTA = null, FILA = [], filaT = null, objPorEnviar = {}, objT = null, idTentado = false, presencaPedida = '';
+function srvOn() { return !!(ONLINE && supa && sessao); }
+function pad4(n) { n = String(n == null ? '' : n); while (n.length < 4) n = '0' + n; return n; }
+function rankInfo(i) { return RANKS[Math.max(0, Math.min(RANKS.length - 1, Number(i) || 0))]; }
+function rpc(nome, args) {
+  return Promise.resolve(supa.rpc(nome, args || {})).then(function (r) {
+    if (r && r.error) { var e = new Error(r.error.message || 'erro'); e.srv = r.error; throw e; }
+    return r ? r.data : null;
+  });
+}
+function erroRede(e) { return !(e && e.srv && e.srv.code); }
+function espelharConta() {
+  var c = CONTA; if (!c || !S.pontos) return;
+  S.pontos.saldo = c.saldo; S.pontos.ganho = c.ganho; S.pontos.protecoes = c.protecoes;
+  S.pontos.log = (c.log || []).map(function (l) { return { t: l.t, n: l.n, m: l.m }; });
+}
+function atualizarChips() {
+  document.querySelectorAll('.points-chip').forEach(function (b) { var t = b.lastChild; if (t && t.nodeType === 3) t.nodeValue = t.nodeValue.replace(/^[\d\s.  ]+/, fmtN(S.pontos.saldo)); });
+}
+function aplicarConta(c) {
+  if (!c || typeof c !== 'object' || c.saldo === undefined || !sessao) return;
+  var primeira = !CONTA;
+  CONTA = c; espelharConta();
+  S.conta = { rank: c.rank, cor: c.cor, nome: c.nome, num: c.num };
+  if (S.perfil && S.perfil.prefs && S.perfil.prefs.paleta) delete S.perfil.prefs.paleta;
+  gravarLocal(); aplicarCorRank();
+  idAutomatico();
+  if (!W && !AUTH.carregando && !aEditar() && !$('#layer').innerHTML) rerender(); else atualizarChips();
+}
+/* Pedidos que falharam por falta de internet ficam numa fila e repetem-se (o servidor ignora repetidos). */
+function guardarFila() { try { localStorage.setItem(chaveLocal + '.fila', JSON.stringify(FILA.slice(-100))); } catch (e) {} }
+function naFila(nome, args) { FILA.push({ f: nome, a: args }); guardarFila(); clearTimeout(filaT); filaT = setTimeout(esvaziarFila, 15000); }
+function esvaziarFila() {
+  if (!srvOn() || !FILA.length) return;
+  var x = FILA[0];
+  rpc(x.f, x.a).then(function (c) { FILA.shift(); guardarFila(); if (c && c.saldo !== undefined) aplicarConta(c); esvaziarFila(); },
+    function (e) { if (erroRede(e)) { clearTimeout(filaT); filaT = setTimeout(esvaziarFila, 20000); } else { FILA.shift(); guardarFila(); esvaziarFila(); } });
+}
+window.addEventListener('online', function () { setTimeout(esvaziarFila, 1000); });
+function chamar(nome, args, depois) {
+  return rpc(nome, args).then(function (c) { if (c && c.saldo !== undefined) aplicarConta(c); if (depois) depois(c); return c; },
+    function (e) { if (erroRede(e)) naFila(nome, args); return null; });
+}
+function ganhar(tipo, ref, sub, n, motivo, semLimite) {
+  if (!srvOn()) return dar(n, motivo, semLimite);
+  chamar('pontos_ganhar', { p_tipo: tipo, p_ref: ref == null ? null : String(ref), p_sub: sub == null ? null : String(sub) }, function (c) {
+    if (!c) return;
+    if (c.dado > 0) toast('+' + c.dado + ' pontos · ' + motivo);
+    else if (n && c.hoje_limite >= LIMITE_DIA) toast('Chegaste ao limite de ' + LIMITE_DIA + ' pontos por dia. Amanhã há mais.');
+  });
+  return n;
+}
+function avisoPresenca(c) {
+  if (!c || !(c.dado > 0)) return;
+  var marco = [3, 7, 14, 30].indexOf(c.seq) >= 0 || (c.seq > 30 && c.seq % 30 === 0);
+  setTimeout(function () { toast('+' + c.dado + ' pontos · ' + (marco ? c.seq + ' dias seguidos' : 'presença de hoje')); }, 600);
+}
+function contaArrancar() {
+  if (!srvOn()) return;
+  try { FILA = JSON.parse(localStorage.getItem(chaveLocal + '.fila') || '[]') || []; } catch (e) { FILA = []; }
+  var pr = S.perfil && presencaPedida !== today() ? (presencaPedida = today(), chamar('presenca', {}, avisoPresenca)) : chamar('conta_estado', {});
+  pr.then(function () { if (!S.perfil || !srvOn()) return; objetivosExistentes(); esvaziarFila(); });
+}
+/* Objetivos (tarefas, temas, testes): o servidor guarda quando foram criados; só contam para o rank 24 h depois. */
+function objetivo(oid) { if (!srvOn()) return; objPorEnviar[oid] = 1; clearTimeout(objT); objT = setTimeout(enviarObjetivos, 1500); }
+function enviarObjetivos() {
+  var L = Object.keys(objPorEnviar).slice(0, 300); if (!L.length || !srvOn()) return;
+  L.forEach(function (k) { delete objPorEnviar[k]; });
+  rpc('objetivos_criar', { p_oids: L }).then(function () { if (Object.keys(objPorEnviar).length) enviarObjetivos(); },
+    function (e) { if (erroRede(e)) { L.forEach(function (k) { objPorEnviar[k] = 1; }); clearTimeout(objT); objT = setTimeout(enviarObjetivos, 20000); } });
+}
+function objetivosExistentes() {
+  S.tarefas.forEach(function (t) { if (!t.ok) objPorEnviar['tarefa:' + t.id] = 1; });
+  S.avaliacoes.forEach(function (a) { if (!a.feita) objPorEnviar['teste:' + a.id] = 1; (a.temas || []).forEach(function (t) { if (!t.ok) objPorEnviar['tema:' + t.id] = 1; }); });
+  enviarObjetivos();
+}
+/* ID público: na primeira vez tenta o primeiro nome (ex.: @bento#0427). */
+function idAutomatico() {
+  if (!CONTA || CONTA.nome || !S.perfil || idTentado) return;
+  idTentado = true;
+  var b = norm((S.perfil.nome || '').trim().split(/\s+/)[0]).replace(/[^a-z0-9]/g, '').slice(0, 16);
+  if (b.length < 3) return;
+  rpc('id_escolher', { p_nome: b }).then(function (c) { if (c && c.ok) aplicarConta(c); }, function () {});
+}
+/* Sessões de foco: o servidor regista o início e conta só o tempo com sinal (um a cada ~5 minutos com a Cumpre aberta). */
+function focoIniciarSrv() {
+  var T = S.timer; if (!T || !srvOn()) return;
+  rpc('foco_iniciar', { p_disc: String(discNome(T.disc) || '').slice(0, 80), p_dur: T.dur || 25 }).then(function (id) { if (S.timer === T) { T.sid = id; T.ultSinal = Date.now(); gravarLocal(); } }, function () {});
+}
+function focoSinal(reset) {
+  var T = S.timer; if (!T || !T.sid || !srvOn()) return;
+  T.ultSinal = Date.now();
+  rpc('foco_sinal', { p_id: T.sid, p_reset: !!reset }).then(null, function () {});
+}
+setInterval(function () {
+  var T = S.timer; if (!T) return;
+  var agora = Date.now();
+  if (T.prox && !T.pausa && !T.saiu && !T.pergunta && !focoAcabou() && agora >= T.prox) { focoSinal(false); T.pergunta = agora; gravarLocal(); renderFoco(); return; }
+  if (T.pergunta && !T.pausa && agora - T.pergunta >= 120000) { T.pausa = T.pergunta; T.pergunta = null; gravarLocal(); renderFoco(); return; }
+  if (T.sid && !T.pausa && !T.saiu && !T.pergunta && document.visibilityState === 'visible' && agora - (T.ultSinal || 0) >= 290000) focoSinal(false);
+}, 15000);
+/* Cor da app: a base segue o modo do telemóvel (branco no claro, preto no escuro) e o rank dá a cor forte e a clara. */
+function aplicarCorRank() {
+  var root = document.documentElement, el = document.getElementById('cor-rank');
+  root.removeAttribute('data-paleta');
+  var r = !ONLINE || !sessao ? null : CONTA ? CONTA.cor : S.conta ? S.conta.cor : null;
+  if (r == null) { root.removeAttribute('data-rank'); if (el) el.textContent = ''; return; }
+  var R = rankInfo(r);
+  if (!el) { el = document.createElement('style'); el.id = 'cor-rank'; document.head.appendChild(el); }
+  var claro = '--btn:' + R.f + ';--btn-ink:' + R.t + ';--btn-hover:' + R.f + ';--accent:' + R.f + ';--on-accent:' + R.t + ';--focus:' + R.f + ';--accent-hero:' + R.c + ';--rank-f:' + R.f + ';--rank-c:' + R.c + ';';
+  var escuro = '--btn:' + R.c + ';--btn-ink:#111111;--btn-hover:' + R.c + ';--accent:' + R.c + ';--on-accent:#111111;--focus:' + R.c + ';--accent-hero:' + R.c + ';';
+  el.textContent = ':root[data-rank]{' + claro + '}@media (prefers-color-scheme: dark){:root[data-rank]:not([data-theme="light"]){' + escuro + '}}:root[data-rank][data-theme="dark"]{' + escuro + '}';
+  root.setAttribute('data-rank', String(r));
+}
+function primeiroNome() { return ((S.perfil && S.perfil.nome) || '').trim().split(/\s+/)[0] || 'Aluno'; }
+function cartaoRank(c) {
+  var R = rankInfo(c.rank), serie = c.series && c.series[c.rank], h = Math.floor((c.foco_seg || 0) / 3600);
+  return '<div class="cartao" style="--f:' + R.f + ';--c:' + R.c + ';--t:' + R.t + '" role="img" aria-label="Cartão Cumpre de ' + esc(primeiroNome()) + ', rank ' + R.n + (c.nome ? ', @' + esc(c.nome) + '#' + pad4(c.num) : '') + '">' +
+    '<div class="cartao-topo"><span class="cartao-marca">cumpre</span><span class="cartao-rank">' + R.n.toUpperCase() + '</span></div>' +
+    '<div><b class="cartao-nome">' + esc(primeiroNome()) + '</b><span class="cartao-id num">' + (c.nome ? '@' + esc(c.nome) + '#' + pad4(c.num) : 'Sem ID') + '</span></div>' +
+    '<div class="cartao-baixo num"><span>' + (serie ? R.n.toUpperCase() + ' · N.º ' + pad4(serie) : 'Rank inicial') + '</span><span>' + plural(h, 'hora', 'horas') + ' de foco · ' + plural(c.seq_max || 0, 'dia seguido', 'dias seguidos') + ' (máx.)</span></div></div>';
+}
+function fmtReq(v) { v = Number(v) || 0; return v % 1 ? String(Math.round(v * 10) / 10).replace('.', ',') : fmtN(v); }
+function linhaReq(nome, ok, txt, tem, pede) {
+  var pct = pede ? Math.min(100, Math.round(tem * 100 / pede)) : 100;
+  return '<div class="req"><span class="req-ok' + (ok ? ' sim' : '') + '" aria-hidden="true">' + ic(ok ? 'check' : 'clock', 'sm') + '</span><span class="small" style="font-weight:600">' + nome + '<span class="sr">' + (ok ? ' (feito)' : ' (por fazer)') + '</span></span><span class="xs muted num" style="text-align:right">' + txt + '</span>' +
+    (ok ? '' : '<span class="bar"><i style="width:' + pct + '%"></i></span>') + '</div>';
+}
+function vRank() {
+  var c = CONTA;
+  if (!c) return '<section class="card stack" aria-labelledby="h-rank"><h2 id="h-rank">O teu rank</h2><p class="small muted">A carregar…</p></section>';
+  var seg = c.seguinte, nomes = { horas: ['Horas de foco', ' h'], objetivos: ['Objetivos cumpridos', ''], dias: ['Dias de conta', ' dias'], seq: ['Dias seguidos (máximo)', ' dias'], verificado: ['Email da escola verificado', ''], pontos: ['Pontos', ' pts'] };
+  var req = '', botao = '';
+  if (seg) {
+    var itens = seg.itens.filter(function (i) { return !((i.k === 'dias' || i.k === 'seq') && !Number(i.pede)) && !(i.k === 'verificado' && !i.pede); });
+    req = itens.map(function (i) {
+      var nm = nomes[i.k];
+      if (i.k === 'verificado') return linhaReq(nm[0], i.ok, i.ok ? 'Feito' : 'Chega em breve', i.ok ? 1 : 0, 1);
+      return linhaReq(nm[0], i.ok, fmtReq(i.tem) + ' de ' + fmtN(Number(i.pede)) + nm[1], Number(i.tem) || 0, Number(i.pede) || 0);
+    }).join('');
+    var falta = itens.filter(function (i) { return !i.ok; }).length;
+    botao = falta ? '<button class="btn ghost" disabled>' + (falta === 1 ? 'Falta 1 requisito' : 'Faltam ' + falta + ' requisitos') + '</button>'
+      : '<button class="btn lg brilho" data-a="rank-subir">Subir para ' + esc(seg.nome) + ' · ' + fmtN(seg.custo) + ' pts</button>';
+  }
+  var cores = '';
+  for (var i = 0; i <= c.rank; i++) { var R = rankInfo(i); cores += '<button class="cor-rank" data-a="rank-cor" data-i="' + i + '" aria-pressed="' + (c.cor === i) + '" style="--f:' + R.f + ';--c:' + R.c + '"><i aria-hidden="true"></i>' + R.n + '</button>'; }
+  var escada = RANKS.map(function (R, k) { return '<div class="li" style="padding:8px 0"><span class="cor-rank" style="--f:' + R.f + ';--c:' + R.c + ';border:0;padding:0;min-height:0;background:none"><i aria-hidden="true"></i></span><span class="grow small"><b>' + R.n + '</b>' + (k === c.rank ? ' · o teu rank' : '') + '<span class="xs muted" style="display:block">' + (k ? R.h + ' h de foco · ' + R.o + ' objetivos' + (k === 2 ? ' · conta com 14 dias' : k === 3 ? ' · 7 dias seguidos' : k === 4 ? ' · conta com 3 meses' : k === 5 ? ' · email da escola · 6 meses' : k === 6 ? ' · email da escola · 9 meses' : '') : 'Onde todos começam') + '</span></span><span class="xs num" style="font-weight:700">' + (k ? fmtN(R.custo) + ' pts' : 'grátis') + '</span></div>'; }).join('');
+  return '<section class="card stack" aria-labelledby="h-rank"><div class="section-head"><h2 id="h-rank">O teu rank</h2><button class="link-btn" data-a="regras">Como funciona</button></div>' +
+    '<div class="cols" style="gap:20px"><div class="stack" style="flex:1 1 300px;align-items:flex-start">' + cartaoRank(c) +
+      (c.nome ? '' : '<button class="btn ghost sm" data-a="id-mudar">Escolher o meu ID</button>') + '</div>' +
+      '<div class="stack" style="flex:1 1 300px;gap:6px">' + (seg ? '<h3>Para chegar a ' + esc(seg.nome) + '</h3><div>' + req + '</div>' + botao + '<p class="xs muted">As horas só contam com o temporizador da Cumpre. Cada tarefa, tema ou teste conta como objetivo 24 h depois de o criares (até 5 por dia).</p>'
+        : '<h3>Chegaste ao topo</h3><p class="small muted">És Mentor da Cumpre. Os privilégios do Mentor chegam numa próxima atualização.</p>') + '</div></div>' +
+    '<div class="stack" style="gap:8px"><h3>Cor da app</h3><div class="cores-rank">' + cores + '</div><p class="xs muted">Podes usar a cor de qualquer rank que já tenhas. A base da app segue o modo claro ou escuro do telemóvel.</p></div>' +
+    '<details class="more"><summary>' + ic('arrowR', 'sm') + 'Todos os ranks</summary><div class="list" style="margin-top:8px">' + escada + '</div></details></section>';
+}
+function vEmblemas() {
+  var e = CONTA && CONTA.emblemas;
+  if (!e) return '<section class="card stack" aria-labelledby="h-emb"><h2 id="h-emb">Emblemas</h2><p class="small muted">A carregar…</p></section>';
+  var L = e.series.map(function (x) {
+    var prox = x.nivel < 5 ? x.lim[x.nivel] : null;
+    return '<div class="emb' + (x.nivel ? ' on' : '') + '"><span class="emb-ico" aria-hidden="true">' + ic(x.nivel ? 'trophy' : 'star', 'sm') + '</span><b class="small">' + esc(x.nome) + (x.nivel ? ' ' + ROMANOS[x.nivel - 1] : '') + '</b>' +
+      '<span class="emb-estrelas" role="img" aria-label="Nível ' + x.nivel + ' de 5">' + '★★★★★'.slice(0, x.nivel) + '<i>' + '★★★★★'.slice(x.nivel) + '</i></span>' +
+      '<span class="xs muted">' + (prox ? fmtReq(x.valor) + ' de ' + fmtN(prox) + ' ' + esc(x.unid) : 'Nível máximo') + '</span></div>';
+  });
+  if (e.fundador) L.unshift('<div class="emb on"><span class="emb-ico" aria-hidden="true">' + ic('trophy', 'sm') + '</span><b class="small">Fundador</b><span class="emb-estrelas">★</span><span class="xs muted">Entraste no primeiro ano da Cumpre</span></div>');
+  return '<section class="card stack" aria-labelledby="h-emb"><h2 id="h-emb">Emblemas</h2><div class="emb-grid">' + L.join('') + '</div><p class="xs muted">Cada nível dá pontos: +10, +25, +50, +100 e +200.</p></section>';
+}
+function vMeuId() {
+  var c = CONTA || S.conta || {};
+  return '<section class="card stack"><div class="section-head"><h2>O teu ID</h2><button class="btn ghost sm" data-a="id-mudar">' + ic('edit', 'sm') + (c.nome ? 'Mudar' : 'Escolher') + '</button></div>' +
+    '<p class="cost num" style="font-size:24px">' + (c.nome ? '@' + esc(c.nome) + '<span class="muted">#' + pad4(c.num) + '</span>' : 'Ainda sem ID') + '</p>' +
+    '<p class="xs muted">É assim que te vão encontrar nos grupos e no ranking, sem mostrar o teu nome completo. O nome pode mudar uma vez a cada 30 dias; o número fica.</p></section>';
+}
+function janId() {
+  var c = CONTA || {};
+  if (c.nome && c.pode_mudar_nome === false) { toast('Só podes mudar o nome uma vez a cada 30 dias.'); return; }
+  abrir(cab('O teu ID', 'Escolhe o nome. O número depois do # é dado pela Cumpre.') +
+    '<form class="stack" data-f="id" novalidate><div class="field"><label for="id-nome">Nome</label><div class="row" style="gap:6px;align-items:center"><span class="cost" aria-hidden="true">@</span><input class="input grow" id="id-nome" maxlength="16" autocomplete="off" autocapitalize="none" spellcheck="false" value="' + esc(c.nome || norm(primeiroNome()).replace(/[^a-z0-9]/g, '')) + '"></div></div>' +
+    '<p class="xs muted">3 a 16 letras minúsculas, números, _ ou . — sem acentos nem espaços.' + (c.nome ? ' Depois de mudares, só voltas a poder mudar daqui a 30 dias.' : '') + '</p>' +
+    '<p class="err" id="id-err" role="alert" hidden></p><button class="btn" type="submit">Guardar</button></form>', '#id-nome');
+}
+function janRankNovo(c) {
+  var R = rankInfo(c.rank);
+  abrir(cab('Agora és ' + R.n + '!', 'És o ' + fmtN(c.serie) + '.º ' + R.n + ' da Cumpre. A app passou a ter as cores do teu rank.') +
+    '<div style="display:flex;justify-content:center">' + cartaoRank(c) + '</div><button class="btn lg brilho" data-a="fechar">Continuar</button>');
 }
 
 /* ---------- Dados oficiais (carregados quando são precisos) ---------- */
@@ -2633,7 +2889,7 @@ function concluirRegisto() {
   if (W.aulasLidas && W.aulasLidas.length) {
     S.aulas = W.aulasLidas.map(function (a) { var d = S.disciplinas.find(function (x) { return norm(x.n) === norm(a.n); }); return d ? { id: uid(), disc: d.id, dia: a.dia, ini: a.ini, fim: a.fim, sala: a.sala } : null; }).filter(Boolean);
   }
-  if (novo) dar(150, 'boas-vindas', true);
+  if (novo) ganhar('boas-vindas', null, null, 150, 'boas-vindas', true);
   if (novo && S.aulas.length) premio('horario', 30, 'horário criado');
   var manual = escolaManual(W);
   W = null;
@@ -2741,9 +2997,9 @@ function vTimerCard() {
   if (!S.disciplinas.length) return '';
   var sug = discSugerida(), dur = UI.focoDur || 25;
   return '<section class="card stack" aria-labelledby="h-estudar"><div class="section-head"><h2 id="h-estudar">Modo foco</h2><span class="xs muted">+2 pontos por cada 5 min</span></div>' +
-    '<p class="small muted">Escolhe quanto tempo. O ecrã fica só com o cronómetro e as horas; se saíres da Cumpre, esse tempo não conta.</p>' +
+    '<p class="small muted">Escolhe quanto tempo. O ecrã fica só com o cronómetro e as horas; se saíres da Cumpre, esse tempo não conta.' + (ONLINE ? ' As horas contam para o teu rank.' : '') + '</p>' +
     '<div class="chips" role="group" aria-label="Duração">' + DUR_FOCO.map(function (m) { return '<button type="button" class="chip num" data-a="foco-dur" data-k="' + m + '" aria-pressed="' + (dur === m) + '">' + (m === 10 ? 'Só 10 min' : m + ' min') + '</button>'; }).join('') + '</div>' +
-    '<div class="row wrap"><div class="field grow" style="min-width:200px"><label for="t-disc" class="sr">Disciplina</label><select class="input" id="t-disc">' + S.disciplinas.map(function (d) { return '<option value="' + d.id + '"' + (d.id === sug ? ' selected' : '') + '>' + esc(d.n) + '</option>'; }).join('') + '</select></div><button class="btn" data-a="estudar">' + ic('play', 'sm') + 'Começar</button></div></section>';
+    '<div class="row wrap"><div class="field grow" style="min-width:200px"><label for="t-disc" class="sr">Disciplina</label><select class="input" id="t-disc">' + S.disciplinas.map(function (d) { return '<option value="' + d.id + '"' + (d.id === sug ? ' selected' : '') + '>' + esc(d.n) + '</option>'; }).join('') + '</select></div><button class="btn brilho" data-a="estudar">' + ic('play', 'sm') + 'Começar</button></div></section>';
 }
 function proximasDatas(max) {
   var t = today();
@@ -2922,9 +3178,12 @@ function vProgresso() {
     ['Primeira troca na loja', Object.keys(S.resgates).length > 0, Object.keys(S.resgates).length ? 'Feito' : 'Troca pontos na loja'],
     ['Nível 3', nv.n >= 3, fmtN(S.pontos.ganho) + ' de 1000 pontos ganhos']
   ];
+  var on = srvOn();
   return '<div class="page-head"><div class="stack" style="gap:2px"><h1>Progresso</h1><span class="muted small">Últimos 7 dias · ' + fmtDia(dias[0]) + ' a ' + fmtDia(t) + '</span></div><div class="seg" role="group" aria-label="Período">' + [['7', '7 dias'], ['tudo', 'Desde o início']].map(function (x) { return '<button data-a="tab-prog" data-k="' + x[0] + '" aria-pressed="' + (UI.tabProgresso === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div></div>' +
+    (on ? vRank() : '') +
     '<div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))">' +
-      '<div class="hero" style="padding:20px;gap:8px"><span class="small" style="font-weight:600;color:var(--hero-muted)">Pontos para gastar</span><span class="hero-title num" style="font-size:36px">' + fmtN(S.pontos.saldo) + '</span><div class="bar" style="height:6px"><i style="width:' + Math.round(nv.resto * 100 / 500) + '%"></i></div><span class="xs muted">Nível ' + nv.n + ' · faltam ' + (500 - nv.resto) + ' pontos para o nível ' + (nv.n + 1) + '</span></div>' +
+      (on ? '<div class="hero" style="padding:20px;gap:8px"><span class="small" style="font-weight:600;color:var(--hero-muted)">Pontos para gastar</span><span class="hero-title num" style="font-size:36px">' + fmtN(S.pontos.saldo) + '</span><span class="xs muted">' + (CONTA ? 'Hoje: ' + fmtN(CONTA.hoje_limite || 0) + ' de ' + LIMITE_DIA + ' pontos a estudar' : 'Para subir de rank e para a loja') + '</span></div>'
+        : '<div class="hero" style="padding:20px;gap:8px"><span class="small" style="font-weight:600;color:var(--hero-muted)">Pontos para gastar</span><span class="hero-title num" style="font-size:36px">' + fmtN(S.pontos.saldo) + '</span><div class="bar" style="height:6px"><i style="width:' + Math.round(nv.resto * 100 / 500) + '%"></i></div><span class="xs muted">Nível ' + nv.n + ' · faltam ' + (500 - nv.resto) + ' pontos para o nível ' + (nv.n + 1) + '</span></div>') +
       tile('flame', 'Sequência', plural(seq, 'dia', 'dias'), seq ? 'Faltam ' + (proximoMarco(seq)[0] - seq) + ' para +' + proximoMarco(seq)[1] + ' pontos' + ((S.pontos.protecoes || 0) ? ' · ' + plural(S.pontos.protecoes, 'proteção', 'proteções') : '') : 'Estuda hoje para começar') +
       tile('clock', 'Tempo de estudo', fmtMin(tot7), 'Média de ' + fmtMin(tot7 / 7) + ' por dia') +
       tile('check', 'Temas revistos', String(temas), plural(S.avaliacoes.length, 'avaliação marcada', 'avaliações marcadas')) +
@@ -2937,7 +3196,7 @@ function vProgresso() {
       '<section class="card stack col-side" aria-labelledby="h-prep"><h2 id="h-prep">Preparação</h2>' + (prox.length ? prox.map(function (a) { var pr = preparacao(a) || { p: 0, f: 0, n: 0 }; return '<button class="li-btn" data-a="aval-abrir" data-id="' + a.id + '" style="flex-direction:column;align-items:stretch;gap:6px;padding:6px 0"><span class="row between small"><b style="overflow-wrap:anywhere">' + esc(discNome(a.disc)) + '</b><b class="num">' + pr.p + '%</b></span><span class="bar" style="height:10px;display:block"><i style="width:' + pr.p + '%"></i></span><span class="xs" style="color:' + (diffDays(t, a.data) <= 7 && pr.p < 50 ? 'var(--warn-text);font-weight:700' : 'var(--muted)') + '">' + pr.f + ' de ' + pr.n + ' temas · ' + esc(a.tipo.toLowerCase()) + ' a ' + fmtDia(a.data) + '</span></button>'; }).join('') : '<p class="muted">Sem avaliações a seguir.</p>') + '</section></div>' +
     '<div class="grid2">' +
       '<section class="card stack" aria-labelledby="h-disc"><h2 id="h-disc">Tempo por disciplina</h2>' + (pd.length ? '<div class="hbar">' + pd.slice(0, 8).map(function (x) { return '<span class="nm" title="' + esc(discNome(x[0])) + '">' + esc(discNome(x[0])) + '</span><span class="track"><i style="width:' + Math.max(3, Math.round(x[1] * 100 / maxD)) + '%"></i></span><span class="xs muted num" style="text-align:right">' + fmtMin(x[1]) + '</span>'; }).join('') + '</div>' : '<p class="muted">Ainda sem sessões de estudo ' + (UI.tabProgresso === '7' ? 'nestes 7 dias' : '') + '.</p>') + '</section>' +
-      '<section class="card stack" aria-labelledby="h-conq"><h2 id="h-conq">Conquistas</h2>' + conq.map(function (c) { return '<div class="row"><span class="tile-ico" style="background:' + (c[1] ? 'var(--accent);color:var(--on-accent)' : 'var(--sand);color:var(--muted)') + '">' + ic(c[1] ? 'trophy' : 'star') + '</span><span class="grow"><span style="display:block;font-weight:600;font-size:15px">' + c[0] + '</span><span class="xs muted">' + esc(c[2]) + '</span></span></div>'; }).join('') + '</section>' +
+      (on ? vEmblemas() : '<section class="card stack" aria-labelledby="h-conq"><h2 id="h-conq">Conquistas</h2>' + conq.map(function (c) { return '<div class="row"><span class="tile-ico" style="background:' + (c[1] ? 'var(--accent);color:var(--on-accent)' : 'var(--sand);color:var(--muted)') + '">' + ic(c[1] ? 'trophy' : 'star') + '</span><span class="grow"><span style="display:block;font-weight:600;font-size:15px">' + c[0] + '</span><span class="xs muted">' + esc(c[2]) + '</span></span></div>'; }).join('') + '</section>') +
       '<section class="card stack" aria-labelledby="h-hist"><div class="section-head"><h2 id="h-hist">Últimos pontos</h2><button class="link-btn" data-a="regras">Regras</button></div>' + (S.pontos.log.length ? '<div class="list">' + S.pontos.log.slice(0, 8).map(function (l) { var d = new Date(l.t); return '<div class="li" style="padding:9px 0"><span class="grow small">' + esc(cap(l.m)) + '<span class="xs muted" style="display:block">' + d.getDate() + ' ' + MESES[d.getMonth()] + ', ' + pad(d.getHours()) + ':' + pad(d.getMinutes()) + '</span></span><b class="num" style="color:' + (l.n < 0 ? 'var(--warn-text)' : 'var(--heading)') + '">' + (l.n > 0 ? '+' : '') + l.n + '</b></div>'; }).join('') + '</div>' : '<p class="muted">Sem movimentos.</p>') + '</section>' +
     '</div>';
 }
@@ -2948,6 +3207,7 @@ function vPerfil() {
   var p = S.perfil, id = idade(p.nasc);
   return '<div class="page-head"><div class="row" style="align-items:center;gap:16px"><button class="avatar" data-a="foto" style="width:88px;height:88px;font-size:28px" aria-label="' + (p.foto ? 'Mudar foto de perfil' : 'Pôr foto de perfil') + '">' + avatarConteudo() + '</button><div class="stack" style="gap:6px"><div><h1>' + esc(p.nome) + '</h1><p class="small muted">' + esc(p.email) + '</p></div><div class="row wrap" style="gap:8px"><button class="btn ghost sm" data-a="foto">' + ic('camera', 'sm') + (p.foto ? 'Mudar foto' : 'Pôr foto') + '</button>' + (p.foto ? '<button class="btn quiet sm" data-a="foto-remover">Remover</button>' : '') + '</div></div></div></div>' +
     '<div class="cols"><div class="col-main">' +
+      (srvOn() ? vMeuId() : '') +
       '<section class="card stack"><div class="section-head"><h2>Escola</h2><button class="btn ghost sm" data-a="editar-perfil">' + ic('edit', 'sm') + 'Editar</button></div><dl class="summary" style="margin:0">' +
         '<dt>Escola</dt><dd>' + esc(p.escola ? p.escola.n : '') + (p.escola && (p.escola.sub || p.escola.m) ? '<span class="xs muted" style="display:block;font-weight:400">' + esc(p.escola.sub || p.escola.m) + '</span>' : '') + '</dd>' +
         (p.curso ? '<dt>Curso</dt><dd>' + esc(p.curso.n) + (p.curso.grau ? ' · ' + esc(p.curso.grau) : '') + '</dd>' : '') +
@@ -3059,8 +3319,9 @@ function janNovoResumo(disc) {
 function janRegras() {
   abrir(cab('Como funcionam os pontos', 'Máximo de ' + LIMITE_DIA + ' pontos por dia a estudar, para ser justo para todos. Os prémios de presença, sequência e primeiras vezes não contam para o máximo.') +
     '<h3>Ganhar</h3><div class="list">' + REGRAS.map(function (r) { return '<div class="li"><span class="grow"><b style="display:block;font-size:15px">' + r[0] + '</b><span class="xs muted">' + r[2] + '</span></span><span class="pill lime num" style="white-space:nowrap">' + r[1] + '</span></div>'; }).join('') + '</div>' +
-    '<h3>Gastar, na Loja</h3><div class="list">' + [['Resumos e formulários', 'grátis a 250', 'ficam teus para sempre'], ['Temas de cores da app', '300', 'muda as cores da Cumpre'], ['Proteção da sequência', '150', 'salva um dia em que não abres a app (guardas até 2)'], ['1.ª explicação grátis', '3 000', '30 minutos com um explicador parceiro']].map(function (r) { return '<div class="li"><span class="grow"><b style="display:block;font-size:15px">' + r[0] + '</b><span class="xs muted">' + r[2] + '</span></span><span class="pill sand num" style="white-space:nowrap">' + r[1] + '</span></div>'; }).join('') + '</div>' +
-    '<p class="small muted">A cada 500 pontos ganhos sobes de nível. O que trocas na loja não te faz descer.</p><button class="btn" data-a="fechar">Percebi</button>');
+    '<h3>Gastar, na Loja</h3><div class="list">' + [['Resumos e formulários', 'grátis a 250', 'ficam teus para sempre'], ['Proteção da sequência', '150', 'salva um dia em que não abres a app (guardas até 2)'], ['1.ª explicação grátis', '3 000', '30 minutos com um explicador parceiro']].map(function (r) { return '<div class="li"><span class="grow"><b style="display:block;font-size:15px">' + r[0] + '</b><span class="xs muted">' + r[2] + '</span></span><span class="pill sand num" style="white-space:nowrap">' + r[1] + '</span></div>'; }).join('') + '</div>' +
+    (ONLINE ? '<h3>Ranks</h3><p class="small">Cada rank pede horas de foco e objetivos cumpridos (tarefas, temas e testes). Quando tens tudo, desbloqueias o rank com pontos e a app ganha as cores dele. As horas só contam com o temporizador da Cumpre aberto, e cada objetivo conta 24 horas depois de o criares (até 5 por dia).</p><p class="small muted">O rank nunca desce. Os pontos e as horas são contados no servidor, iguais em todos os teus aparelhos.</p>'
+      : '<p class="small muted">A cada 500 pontos ganhos sobes de nível. O que trocas na loja não te faz descer.</p>') + '<button class="btn" data-a="fechar">Percebi</button>');
 }
 function janResgatar(it) {
   abrir(cab('Trocar por ' + it.custo + ' pontos?', it.t) + '<p>Ficas com ' + fmtN(S.pontos.saldo - it.custo) + ' pontos. O resumo fica teu para sempre, na loja e na pasta da disciplina.</p><div class="row"><button class="btn ghost grow" data-a="fechar">Agora não</button><button class="btn grow" data-a="resgatar-ok" data-id="' + it.id + '">Trocar</button></div>');
@@ -3124,32 +3385,45 @@ var A = {
     if (!d) { toast('Junta primeiro uma disciplina.'); return; }
     if (S.timer) { fechar(); UI.focoMin = false; renderFoco(); pedirFoco(); return; }
     var dur = Number(el.dataset.dur) || UI.focoDur || 25;
-    S.timer = { disc: d, ini: Date.now(), dur: dur, fora: 0 };
+    S.timer = { disc: d, ini: Date.now(), dur: dur, fora: 0, prox: Date.now() + (25 + Math.floor(Math.random() * 21)) * 60000 };
+    focoIniciarSrv();
     UI.focoMin = false; guardar(); fechar(); ir('hoje'); renderFoco(); pedirFoco();
   },
   'foco-dur': function (el) { UI.focoDur = Number(el.dataset.k); document.querySelectorAll('[data-a="foco-dur"]').forEach(function (b) { b.setAttribute('aria-pressed', b === el); }); },
   'foco-abrir': function () { if (!S.timer) { ir('hoje'); return; } fechar(); UI.focoMin = false; renderFoco(); pedirFoco(); },
   'foco-minimizar': function () { UI.focoMin = true; sairFoco(); renderFoco(); rerender(); },
-  'foco-pausa': function () { if (S.timer && !S.timer.pausa) { S.timer.pausa = Date.now(); guardar(); renderFoco(); } },
-  'foco-continuar': function () { var T = S.timer; if (T && T.pausa) { T.fora = (T.fora || 0) + (Date.now() - T.pausa); T.pausa = null; guardar(); renderFoco(); } },
+  'foco-pausa': function () { if (S.timer && !S.timer.pausa) { focoSinal(false); S.timer.pausa = Date.now(); S.timer.pergunta = null; guardar(); renderFoco(); } },
+  'foco-continuar': function () { var T = S.timer; if (T && T.pausa) { T.fora = (T.fora || 0) + (Date.now() - T.pausa); T.pausa = null; T.prox = Date.now() + (25 + Math.floor(Math.random() * 21)) * 60000; focoSinal(true); guardar(); renderFoco(); } },
+  'foco-sim': function () { var T = S.timer; if (T) { T.pergunta = null; T.prox = Date.now() + (25 + Math.floor(Math.random() * 21)) * 60000; focoSinal(true); gravarLocal(); renderFoco(); } },
   'foco-mais': function () { if (S.timer) { S.timer.dur = Math.ceil(focoSeg() / 60) + 5; guardar(); renderFoco(); } },
   parar: function () {
     var T = S.timer;
     if (!T) return;
-    var seg = focoSeg(), min = Math.min(240, Math.floor(seg / 60)), disc = T.disc, d = iso(new Date(T.ini)), completa = !!(T.dur && seg >= T.dur * 60);
+    var seg = focoSeg(), min = Math.min(240, Math.floor(seg / 60)), disc = T.disc, d = iso(new Date(T.ini)), completa = !!(T.dur && seg >= T.dur * 60), sid = T.sid;
     S.timer = null; UI.focoMin = false; sairFoco(); renderFoco();
     if (min >= 1) {
       S.sessoes.push({ d: d, disc: disc, min: min });
       if (S.sessoes.length > 1500) S.sessoes = S.sessoes.slice(-1500);
       marcarAtividade();
       var p = ptsFoco(min, completa);
-      if (p) dar(p, fmtMin(min) + ' de ' + discNome(disc) + (completa ? ' · sessão completa' : '')); else toast('Estudaste ' + fmtMin(min) + '. A cada 5 minutos em foco ganhas 2 pontos.');
-      premio('foco-1', 20, 'primeira sessão em modo foco');
+      if (srvOn()) {
+        if (sid) chamar('foco_terminar', { p_id: sid, p_seg: seg, p_completa: completa }, function (c) {
+          var f = (c && c.foco) || {};
+          if (!c) return;
+          if (f.dado > 0) toast('+' + f.dado + ' pontos · ' + fmtMin(f.min) + ' de ' + discNome(disc) + (completa ? ' · sessão completa' : ''));
+          else if (f.min >= 5 && c.hoje_limite >= LIMITE_DIA) toast('Estudaste ' + fmtMin(f.min) + '. Já tinhas os ' + LIMITE_DIA + ' pontos de hoje, mas as horas contam para o rank.');
+          else toast('Estudaste ' + fmtMin(min) + '. Para o rank só conta o tempo com a Cumpre aberta.');
+        });
+        else toast('Estudaste ' + fmtMin(min) + '. Estavas sem internet quando começaste: fica no histórico, mas não conta para os pontos nem para o rank.');
+      } else {
+        if (p) dar(p, fmtMin(min) + ' de ' + discNome(disc) + (completa ? ' · sessão completa' : '')); else toast('Estudaste ' + fmtMin(min) + '. A cada 5 minutos em foco ganhas 2 pontos.');
+        premio('foco-1', 20, 'primeira sessão em modo foco');
+      }
       verPlanoCumprido();
-    } else toast('Sessão muito curta: não ficou registada.');
+    } else { toast('Sessão muito curta: não ficou registada.'); if (sid && srvOn()) rpc('foco_cancelar', { p_id: sid }).then(null, function () {}); }
     guardar(); rerender();
   },
-  'cancelar-timer': function () { S.timer = null; UI.focoMin = false; sairFoco(); renderFoco(); guardar(); rerender(); toast('Sessão cancelada.'); },
+  'cancelar-timer': function () { if (S.timer && S.timer.sid && srvOn()) rpc('foco_cancelar', { p_id: S.timer.sid }).then(null, function () {}); S.timer = null; UI.focoMin = false; sairFoco(); renderFoco(); guardar(); rerender(); toast('Sessão cancelada.'); },
   'aval-nova': function (el) { if (!S.disciplinas.length) { toast('Junta primeiro uma disciplina em Pastas.'); return; } janAvaliacao(null, el.dataset.d); },
   'aval-abrir': function (el) { janVerAvaliacao(el.dataset.id, el.dataset.foco); },
   'aval-editar': function (el) { janAvaliacao(S.avaliacoes.find(function (x) { return x.id === el.dataset.id; })); },
@@ -3159,7 +3433,7 @@ var A = {
     var a = S.avaliacoes.find(function (x) { return x.id === el.dataset.a2; }), t = a && a.temas.find(function (x) { return x.id === el.dataset.id; });
     if (!t) return;
     t.ok = el.checked;
-    if (t.ok && !t.pts) { t.pts = 1; marcarAtividade(); dar(10, 'tema revisto: ' + t.t); verPlanoCumprido(); }
+    if (t.ok && !t.pts) { t.pts = 1; marcarAtividade(); ganhar('tema', t.id, null, 10, 'tema revisto: ' + t.t); verPlanoCumprido(); }
     guardar(); rerender(); janVerAvaliacao(a.id, '[data-a="tema-ok"][data-id="' + t.id + '"]');
   },
   'tema-del': function (el) { var a = S.avaliacoes.find(function (x) { return x.id === el.dataset.a2; }); a.temas = a.temas.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); rerender(); janVerAvaliacao(a.id); },
@@ -3167,7 +3441,7 @@ var A = {
     var x = S.tarefas.find(function (t) { return t.id === el.dataset.id; });
     if (!x) return;
     x.ok = el.checked; x.okEm = x.ok ? today() : null;
-    if (x.ok && !x.pts) { x.pts = 1; marcarAtividade(); dar(5, 'tarefa feita'); }
+    if (x.ok && !x.pts) { x.pts = 1; marcarAtividade(); ganhar('tarefa', x.id, null, 5, 'tarefa feita'); }
     guardar(); rerender();
   },
   'tarefa-del': function (el) { S.tarefas = S.tarefas.filter(function (t) { return t.id !== el.dataset.id; }); guardar(); rerender(); },
@@ -3222,6 +3496,15 @@ var A = {
     if (!it) { fechar(); return; }
     if (S.resgates[it.id]) { fechar(); ir('leitor', { item: it.id }); return; }
     if (S.pontos.saldo < it.custo) { fechar(); toast('Não tens pontos suficientes.'); return; }
+    if (srvOn() && it.custo) {
+      fechar();
+      rpc('loja_trocar', { p_item: it.id, p_ref: null }).then(function (c) {
+        aplicarConta(c);
+        if (!c.ok) { toast(c.erro || 'Não deu para trocar.'); return; }
+        S.resgates[it.id] = Date.now(); guardar(); ir('leitor', { item: it.id }); toast('Trocado. Já é teu.');
+      }, function () { toast('Sem ligação à internet. Tenta outra vez.'); });
+      return;
+    }
     S.pontos.saldo -= it.custo; S.resgates[it.id] = Date.now();
     if (it.custo) { S.pontos.log.unshift({ t: Date.now(), n: -it.custo, m: 'troca: ' + it.t }); }
     guardar(); fechar(); ir('leitor', { item: it.id }); toast(it.custo ? 'Trocado. Já é teu.' : 'Já é teu.');
@@ -3231,7 +3514,7 @@ var A = {
     var id = el.dataset.id, i = Number(el.dataset.i), it = LOJA.find(function (x) { return x.id === id; });
     var L = S.lidos[id] = S.lidos[id] || [];
     var k = L.indexOf(i); if (k >= 0) L.splice(k, 1); else L.push(i);
-    if (L.length === it.s.length && !S.premios['ler-' + id]) { S.premios['ler-' + id] = 1; marcarAtividade(); dar(10, 'leste ' + it.t); }
+    if (L.length === it.s.length && !S.premios['ler-' + id]) { S.premios['ler-' + id] = 1; marcarAtividade(); ganhar('ler', id, null, 10, 'leste ' + it.t); }
     guardar(); rerender();
   },
   regras: function () { janRegras(); },
@@ -3273,14 +3556,20 @@ var A = {
   'explicacao-cancelar-ok': function (el) {
     var x = (S.pedidos || []).find(function (y) { return y.id === el.dataset.id; });
     if (x && x.estado === 'à procura' && !x.devolvido) {
-      x.estado = 'cancelado'; x.devolvido = true; devolver(CUSTO_EXPLICACAO, 'pedido de explicação cancelado');
-      if (ONLINE && supa && sessao) supa.from('pedidos_explicacao').update({ estado: 'cancelado' }).eq('user_id', sessao.id).eq('pid', x.id).then(null, function () {});
+      x.estado = 'cancelado'; x.devolvido = true;
+      if (srvOn()) { var pid = x.id; Promise.resolve(supa.from('pedidos_explicacao').update({ estado: 'cancelado' }).eq('user_id', sessao.id).eq('pid', pid)).then(null, function () {}).then(function () { chamar('loja_devolver', { p_pid: pid }); }); }
+      else devolver(CUSTO_EXPLICACAO, 'pedido de explicação cancelado');
     }
     guardar(); fechar(); rerender(); toast('Pedido cancelado. Os pontos voltaram.');
   },
   protecao: function () { abrir(cab('Trocar por ' + CUSTO_PROTECAO + ' pontos?', 'Proteção da sequência') + '<p>Se um dia não abrires a Cumpre, a proteção usa-se sozinha e a tua sequência continua. Ficas com ' + fmtN(S.pontos.saldo - CUSTO_PROTECAO) + ' pontos.</p><div class="row"><button class="btn ghost grow" data-a="fechar">Agora não</button><button class="btn grow" data-a="protecao-ok">Trocar</button></div>'); },
   'protecao-ok': function () {
     if ((S.pontos.protecoes || 0) >= MAX_PROTECOES || S.pontos.saldo < CUSTO_PROTECAO) { fechar(); return; }
+    if (srvOn()) {
+      fechar();
+      rpc('loja_trocar', { p_item: 'protecao', p_ref: null }).then(function (c) { aplicarConta(c); toast(c.ok ? 'Proteção guardada. Tens ' + c.protecoes + '.' : (c.erro || 'Não deu para trocar.')); }, function () { toast('Sem ligação à internet. Tenta outra vez.'); });
+      return;
+    }
     gastar(CUSTO_PROTECAO, 'troca: proteção da sequência'); S.pontos.protecoes = (S.pontos.protecoes || 0) + 1;
     guardar(); fechar(); rerender(); toast('Proteção guardada. Tens ' + S.pontos.protecoes + '.');
   },
@@ -3292,6 +3581,12 @@ var A = {
   },
   'paleta-usar': function (el) { if (!temPaleta(el.dataset.k)) return; S.perfil.prefs = S.perfil.prefs || {}; S.perfil.prefs.paleta = el.dataset.k; guardar(); rerender(); },
   fechar: function () { fechar(); },
+  'rank-subir': function (el) {
+    el.disabled = true;
+    rpc('rank_subir', {}).then(function (c) { aplicarConta(c); if (c.ok) janRankNovo(c); else { toast(c.erro || 'Ainda não dá.'); rerender(); } }, function () { el.disabled = false; toast('Sem ligação à internet. Tenta outra vez.'); });
+  },
+  'rank-cor': function (el) { if (!CONTA) return; var i = Number(el.dataset.i); chamar('cor_escolher', { p_rank: i >= CONTA.rank ? null : i }); },
+  'id-mudar': function () { janId(); },
   'fechar-fundo': function (el, e) { if (e.target === el) fechar(); }
 };
 
@@ -3402,9 +3697,20 @@ document.addEventListener('submit', function (e) {
   if (f.id === 'auth') { if (!AUTH.ocupado) enviarAuth(); return; }
   if (f.id === 'link') { enviarLink(); return; }
   var k = f.dataset.f;
+  if (k === 'id') {
+    var nm = ($('#id-nome').value || '').trim().toLowerCase().replace(/^@/, '');
+    if (!/^[a-z0-9_.]{3,16}$/.test(nm)) { erroForm('#id-err', 'Usa 3 a 16 letras minúsculas, números, _ ou . (sem acentos nem espaços).'); return; }
+    var bt = f.querySelector('button[type="submit"]'); if (bt) bt.disabled = true;
+    rpc('id_escolher', { p_nome: nm }).then(function (c) {
+      if (bt) bt.disabled = false;
+      if (!c.ok) { erroForm('#id-err', c.erro || 'Não deu para guardar.'); return; }
+      fechar(); aplicarConta(c); toast('O teu ID: @' + c.nome + '#' + pad4(c.num));
+    }, function () { if (bt) bt.disabled = false; erroForm('#id-err', 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
   if (k === 'tarefa') {
     var v = $('#n-tarefa').value.trim(); if (!v) return;
-    S.tarefas.unshift({ id: uid(), t: v, ok: false, criada: today() }); guardar(); rerender(); var n = $('#n-tarefa'); if (n) n.focus();
+    var nt = { id: uid(), t: v, ok: false, criada: today() }; S.tarefas.unshift(nt); objetivo('tarefa:' + nt.id); guardar(); rerender(); var n = $('#n-tarefa'); if (n) n.focus();
   } else if (k === 'aval') {
     var data = $('#a-data').value, disc = $('#a-disc').value;
     if (!data) { erroForm('#a-err', 'Escolhe a data.'); return; }
@@ -3413,7 +3719,7 @@ document.addEventListener('submit', function (e) {
     if (a) Object.assign(a, obj);
     else {
       var temas = ($('#a-temas').value || '').split('\n').map(function (s) { return s.trim(); }).filter(Boolean).slice(0, 40).map(function (s) { return { id: uid(), t: s, ok: false }; });
-      a = Object.assign({ id: uid(), temas: temas, feita: false, criada: today() }, obj); S.avaliacoes.push(a);
+      a = Object.assign({ id: uid(), temas: temas, feita: false, criada: today() }, obj); S.avaliacoes.push(a); objetivo('teste:' + a.id);
       if (temas.length) ptsTemas(a, temas.length);
     }
     guardar(); fechar(); rerender(); toast(id ? 'Avaliação atualizada.' : 'Avaliação marcada para ' + fmtDia(data) + '.');
@@ -3425,7 +3731,7 @@ document.addEventListener('submit', function (e) {
     var a3 = S.avaliacoes.find(function (x) { return x.id === f.dataset.id; });
     if (!a3 || a3.feita) return;
     a3.feita = true; a3.nota = $('#f-nota').value.trim();
-    if (!a3.pts) { a3.pts = 1; marcarAtividade(); dar(30, a3.tipo.toLowerCase() + ' de ' + discNome(a3.disc)); }
+    if (!a3.pts) { a3.pts = 1; marcarAtividade(); ganhar('teste', a3.id, null, 30, a3.tipo.toLowerCase() + ' de ' + discNome(a3.disc)); }
     guardar(); fechar(); rerender();
   } else if (k === 'aula') {
     var ini = $('#h-ini').value, fim = $('#h-fim').value, hd = $('#h-disc').value;
@@ -3450,6 +3756,16 @@ document.addEventListener('submit', function (e) {
     if (!$('#ex-ok').checked) { erroForm('#ex-err', menorEx ? 'Precisamos da autorização do teu encarregado de educação.' : 'Precisamos da tua autorização para partilhar o contacto.'); return; }
     if (S.pontos.saldo < CUSTO_EXPLICACAO || pedidoAberto()) { fechar(); return; }
     var dEx = $('#ex-disc').value, ped = { id: uid(), tipo: 'explicacao', disc: dEx, discN: discNome(dEx), nivel: S.perfil.nivel, ano: S.perfil.ano, escola: S.perfil.escola ? S.perfil.escola.n : '', formato: formato, local: $('#ex-local').value.trim(), quando: $('#ex-quando').value.trim(), contacto: { email: exEmail, tel: $('#ex-tel').value.trim(), de: menorEx ? 'encarregado de educação' : 'aluno' }, estado: 'à procura', em: Date.now() };
+    if (srvOn()) {
+      fechar();
+      rpc('loja_trocar', { p_item: 'explicacao', p_ref: ped.id }).then(function (c) {
+        aplicarConta(c);
+        if (!c.ok) { toast(c.erro || 'Não deu para fazer o pedido.'); return; }
+        S.pedidos = S.pedidos || []; S.pedidos.push(ped); guardar(); enviarPedidoOnline(ped); rerender();
+        toast('Pedido feito. Vamos procurar um explicador de ' + ped.discN + ' e dizemos-te.');
+      }, function () { toast('Sem ligação à internet. Tenta outra vez.'); });
+      return;
+    }
     gastar(CUSTO_EXPLICACAO, 'troca: 1.ª explicação grátis'); S.pedidos = S.pedidos || []; S.pedidos.push(ped);
     guardar(); enviarPedidoOnline(ped); fechar(); rerender(); toast('Pedido feito. Vamos procurar um explicador de ' + ped.discN + ' e dizemos-te.');
   } else if (k === 'media-add') {
