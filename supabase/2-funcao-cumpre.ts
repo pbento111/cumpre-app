@@ -3,7 +3,9 @@
 //   1. vai buscar o calendário da escola pelo link (o site da escola não deixa o browser lê-lo diretamente);
 //   2. lê com IA (Claude) a foto do horário ou do quadro e devolve as aulas ou as tarefas para o aluno confirmar;
 //   3. envia os lembretes para o telemóvel (chamada de 10 em 10 minutos pelo agendador do Supabase);
-//   4. apaga a conta de um aluno quando ele pede, com tudo o que guardou.
+//   4. apaga a conta de um aluno quando ele pede, com tudo o que guardou;
+//   5. envia o código de verificação para o email da escola (Resend);
+//   6. revê com IA as mensagens denunciadas no chat dos grupos (chamada pela base de dados, com o segredo do agendador).
 // Tirando os lembretes (que trazem um segredo próprio), só aceita pedidos de alunos com sessão iniciada.
 import { createClient } from 'npm:@supabase/supabase-js@2.110.9';
 
@@ -357,6 +359,109 @@ async function enviarLembretes(req: Request): Promise<Response> {
   return json({ ok: true, enviados });
 }
 
+// ---------- Verificação pelo email da escola ----------
+// deno-lint-ignore no-explicit-any
+async function enviarVerificacao(corpo: any, alunoId: string): Promise<Response> {
+  const chave = Deno.env.get('RESEND_API_KEY');
+  if (!chave) return json({ erro: 'A verificação pelo email da escola ainda não está ligada. Tenta daqui a uns dias.' }, 503);
+  const { data, error } = await admin.rpc('cumpre_verificacao_criar', { u: alunoId, p_email: String(corpo.email || '').slice(0, 120) });
+  if (error) return json({ erro: 'O servidor da Cumpre não respondeu. Tenta daqui a pouco.' }, 500);
+  if (!data?.ok) return json({ erro: data?.erro || 'Não deu para enviar o código.' }, 400);
+  const codigo = String(data.codigo);
+  const html = `<!doctype html><html lang="pt"><body style="margin:0;background:#f4f4f2;font-family:Arial,Helvetica,sans-serif;color:#111">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:32px 16px">
+<table role="presentation" width="100%" style="max-width:480px;background:#fff;border-radius:16px" cellpadding="0" cellspacing="0"><tr><td style="padding:28px">
+<p style="font-size:22px;font-weight:700;margin:0 0 16px">cumpre</p>
+<p style="font-size:16px;line-height:1.5;margin:0 0 16px">O teu código para verificar o email da escola na Cumpre é:</p>
+<p style="font-size:34px;font-weight:700;letter-spacing:8px;margin:0 0 16px">${codigo}</p>
+<p style="font-size:14px;line-height:1.5;color:#55554f;margin:0">Escreve-o na app nos próximos 10 minutos. Se não foste tu que pediste, ignora este email: ninguém fica com acesso à tua conta.</p>
+</td></tr></table></td></tr></table></body></html>`;
+  let r: Response;
+  try {
+    r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${chave}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: Deno.env.get('CUMPRE_EMAIL_DE') || 'Cumpre <verificacao@cumpre.pt>',
+        to: [data.email],
+        subject: `${codigo} é o teu código da Cumpre`,
+        html,
+        text: `O teu código para verificar o email da escola na Cumpre é ${codigo}. Escreve-o na app nos próximos 10 minutos. Se não foste tu, ignora este email.`,
+      }),
+      signal: AbortSignal.timeout(15000),
+    });
+  } catch {
+    return json({ erro: 'O email não saiu. Tenta outra vez daqui a pouco.' }, 502);
+  }
+  if (!r.ok) {
+    console.error('Resend', r.status, (await r.text()).slice(0, 300));
+    return json({ erro: 'O email não saiu. Confirma o endereço e tenta outra vez.' }, 502);
+  }
+  return json({ ok: true });
+}
+
+// ---------- Revisão por IA das mensagens denunciadas ----------
+const REGRAS_CHAT = `Regras do chat da Cumpre (app de estudo para alunos em Portugal, muitos menores):
+1. Respeito: sem insultos, gozo, humilhação ou exclusão de colegas.
+2. Sem assédio nem ameaças.
+3. Sem conteúdo sexual, violento ou de ódio (racismo, homofobia, etc.).
+4. Privacidade: não partilhar fotos, números, moradas ou prints de conversas de alguém sem autorização.
+5. Sem batota académica: não partilhar respostas de testes durante o teste nem vender trabalhos.
+6. Sem spam nem publicidade.
+7. Não fingir ser outra pessoa nem a equipa da Cumpre.
+8. Os grupos são para estudar (conversa é bem-vinda).
+Gravidade: nenhuma (não viola as regras), leve (spam, linguagem imprópria, fora do tema), media (insulto a alguém, partilhar dados de outros, batota),
+grave (assédio, ódio, ameaça, conteúdo sexual), gravissima (conteúdo sexual com menores, aliciamento, ameaça séria à vida).
+Na dúvida entre duas, escolhe a menor. Responde só com JSON: {"gravidade": "...", "regra": n, "motivo": "frase curta em português de Portugal, dirigida ao aluno"}.`;
+
+// deno-lint-ignore no-explicit-any
+async function moderar(req: Request, corpo: any): Promise<Response> {
+  const { data: cfg } = await admin.from('config_privada').select('valor').eq('chave', 'cron').maybeSingle();
+  const segredo = typeof cfg?.valor === 'string' ? cfg.valor : '';
+  if (!segredo || req.headers.get('x-cumpre-cron') !== segredo) return json({ erro: 'Sem autorização.' }, 401);
+  const chaveIA = Deno.env.get('ANTHROPIC_API_KEY');
+  const id = Number(corpo.mensagem);
+  if (!chaveIA || !id) return json({ ok: false, motivo: 'sem IA' });
+  const { data: cx } = await admin.rpc('cumpre_mensagem_contexto', { p_msg: id });
+  if (!cx?.mensagem) return json({ ok: false });
+  // deno-lint-ignore no-explicit-any
+  const antes = (cx.contexto || []).map((m: any) => `[${m.quem}] ${String(m.texto || '').slice(0, 300)}`).join('\n') || '(nenhuma)';
+  const pedido = `${REGRAS_CHAT}
+
+Idade de quem escreveu: ${Number(cx.mensagem.idade) || 'desconhecida'}.
+Motivos das denúncias: ${(cx.denuncias || []).join(', ') || '—'}.
+Mensagens anteriores no grupo (da mais antiga para a mais recente):
+${antes}
+
+Mensagem denunciada${cx.mensagem.anexo ? ' (tem uma foto ou ficheiro que não consegues ver)' : ''}:
+«${String(cx.mensagem.texto || '').slice(0, 1000)}»`;
+  let r: Response;
+  try {
+    r = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'x-api-key': chaveIA, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
+      body: JSON.stringify({ model: Deno.env.get('CUMPRE_MODELO_MOD') || 'claude-haiku-5-5', max_tokens: 400, messages: [{ role: 'user', content: pedido }] }),
+      signal: AbortSignal.timeout(40000),
+    });
+  } catch {
+    return json({ ok: false, motivo: 'IA sem resposta' }, 504);
+  }
+  if (!r.ok) { console.error('Anthropic moderar', r.status, (await r.text()).slice(0, 300)); return json({ ok: false }, 502); }
+  const j = await r.json();
+  // deno-lint-ignore no-explicit-any
+  const texto = Array.isArray(j.content) ? j.content.filter((c: any) => c.type === 'text').map((c: any) => c.text).join('\n') : '';
+  const i = texto.indexOf('{'), f = texto.lastIndexOf('}');
+  // deno-lint-ignore no-explicit-any
+  let res: any = null;
+  try { res = JSON.parse(texto.slice(i, f + 1)); } catch { /* sem JSON */ }
+  const grav = ['nenhuma', 'leve', 'media', 'grave', 'gravissima'].includes(res?.gravidade) ? res.gravidade : null;
+  if (!grav) return json({ ok: false, motivo: 'resposta inválida' }, 502);
+  const regra = Math.min(8, Math.max(1, Number(res.regra) || 1));
+  const { error } = await admin.rpc('cumpre_moderar_resultado', { p_msg: id, p_grav: grav, p_regra: regra, p_motivo: String(res.motivo || '').slice(0, 280) || 'Mensagem contra as regras do chat.' });
+  if (error) return json({ ok: false }, 500);
+  return json({ ok: true, gravidade: grav });
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     const pedidos = req.headers.get('Access-Control-Request-Headers');
@@ -370,6 +475,7 @@ Deno.serve(async (req) => {
 
   // O agendador do Supabase chama isto de 10 em 10 minutos, com o segredo guardado na base de dados.
   if (corpo.acao === 'enviar-lembretes') return await enviarLembretes(req);
+  if (corpo.acao === 'moderar') return await moderar(req, corpo);
 
   const token = (req.headers.get('Authorization') || '').replace(/^Bearer\s+/i, '');
   const { data: quem } = await admin.auth.getUser(token);
@@ -399,6 +505,7 @@ Deno.serve(async (req) => {
   if (corpo.acao === 'horario-foto') return await lerHorario(corpo, aluno.id);
   if (corpo.acao === 'quadro-foto') return await lerComIA(corpo, aluno.id, 'quadro');
   if (corpo.acao === 'vapid') return json({ chave: (await chavesVapid()).pub });
+  if (corpo.acao === 'verificar-enviar') return await enviarVerificacao(corpo, aluno.id);
 
   if (corpo.acao === 'apagar-conta') {
     const pasta = aluno.id;
@@ -406,6 +513,10 @@ Deno.serve(async (req) => {
       const { data: ficheiros } = await admin.storage.from('anexos').list(pasta, { limit: 1000 });
       if (!ficheiros || !ficheiros.length) break;
       await admin.storage.from('anexos').remove(ficheiros.map((f) => pasta + '/' + f.name));
+    }
+    for (const g of ((await admin.storage.from('chat').list(pasta, { limit: 1000 })).data || [])) {
+      const { data: fs } = await admin.storage.from('chat').list(pasta + '/' + g.name, { limit: 1000 });
+      if (fs?.length) await admin.storage.from('chat').remove(fs.map((f) => pasta + '/' + g.name + '/' + f.name));
     }
     await admin.from('estado').delete().eq('user_id', aluno.id);
     const { error } = await admin.auth.admin.deleteUser(aluno.id);
