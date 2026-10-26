@@ -179,9 +179,9 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .main { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8px calc(110px + env(safe-area-inset-bottom, 0px)); }
 .content { max-width: 1120px; margin: 0 auto; display: flex; flex-direction: column; gap: 24px; }
-.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--surface); border-top: 1px solid var(--line); padding: 8px max(8px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.tabbar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: var(--surface); border-top: 1px solid var(--line); padding: 8px max(8px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left, 0px)); display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
 .tab { background: none; border: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--muted); font-size: 12px; font-weight: 500; padding: 2px 0; min-height: 52px; }
-.tab .pillbg { width: 56px; height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+.tab .pillbg { width: min(56px, 100%); height: 30px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
 .tab[aria-current="page"] { color: var(--heading); font-weight: 700; }
 .tab[aria-current="page"] .pillbg { background: var(--accent); color: var(--on-accent); }
 .page-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px; }
@@ -365,6 +365,34 @@ details.more > summary::-webkit-details-marker { display: none; }
 .emb.on .emb-ico { background: var(--accent); color: var(--on-accent); }
 .emb-estrelas { color: var(--heading); letter-spacing: 2px; font-size: 14px; }
 .emb-estrelas i { font-style: normal; color: var(--line-strong); opacity: .45; }
+/* Ranking, grupos e chat */
+.bola-rank { width: 14px; height: 14px; border-radius: 999px; display: inline-block; flex-shrink: 0; background: linear-gradient(135deg, var(--f) 50%, var(--c) 50%); vertical-align: -2px; }
+.rk { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.rk-li { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; min-width: 0; }
+.rk-li.eu { background: var(--soft); }
+.rk-li .grow { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rk-pos { width: 26px; text-align: right; font-weight: 700; color: var(--muted); flex-shrink: 0; }
+.grupo-li { display: flex; align-items: center; gap: 12px; width: 100%; text-align: left; padding: 12px 0; border: 0; border-bottom: 1px solid var(--line); background: none; color: var(--ink); font: inherit; cursor: pointer; }
+.grupo-li:last-child { border-bottom: 0; }
+.grupo-li .grow { min-width: 0; }
+.grupo-li .prev { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.badge-n { min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: var(--accent); color: var(--on-accent); font-size: 12px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; }
+.codigo-chip { display: inline-flex; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px; border: 1px dashed var(--line-strong); background: var(--surface); color: var(--ink); font: 700 16px var(--display); letter-spacing: .08em; cursor: pointer; }
+.chat { display: flex; flex-direction: column; gap: 10px; }
+.chat-lista { display: flex; flex-direction: column; gap: 8px; max-height: min(62vh, 640px); min-height: 220px; overflow-y: auto; padding: 4px 2px; overscroll-behavior: contain; }
+.msg { align-self: flex-start; max-width: min(86%, 560px); background: var(--sand); border-radius: 14px 14px 14px 4px; padding: 8px 12px 10px; min-width: 0; }
+.msg.eu { align-self: flex-end; background: var(--soft); border-radius: 14px 14px 4px 14px; }
+.msg-topo { display: flex; align-items: center; gap: 6px; min-width: 0; }
+.msg-topo .xs:first-of-type { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.msg-mais { margin-left: auto; width: 32px; height: 28px; border: 0; background: none; color: var(--muted); border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.msg-corpo { font-size: 15px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; margin-top: 2px; }
+.msg-corpo a { color: inherit; }
+.msg-img { display: block; max-width: 100%; max-height: 320px; border-radius: 10px; margin-top: 6px; background: var(--line); min-height: 60px; }
+.chat-form { display: flex; gap: 8px; align-items: flex-end; }
+.chat-form textarea { resize: none; min-height: 44px; max-height: 140px; }
+.tabs-g { display: flex; gap: 6px; flex-wrap: wrap; }
+.mod-card { border: 1px solid var(--line); border-radius: var(--r); padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.mod-ctx { font-size: 13px; color: var(--muted); border-left: 3px solid var(--line); padding-left: 10px; display: grid; gap: 2px; }
 .foco-pergunta { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 18px; }
 .swatches { display: flex; gap: 6px; }
 .swatches i { width: 26px; height: 26px; border-radius: 999px; border: 1px solid var(--line); display: block; }
@@ -487,7 +515,13 @@ var ICON = {
   user: '<circle cx="12" cy="8.5" r="4"/><path d="M4.5 20.5c1.2-3.6 4-5.5 7.5-5.5s6.3 1.9 7.5 5.5"/>',
   camera: '<path d="M4 8.5A1.5 1.5 0 0 1 5.5 7H8l1.5-2h5L16 7h2.5A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z"/><circle cx="12" cy="12.5" r="3.5"/>',
   clip: '<path d="m20 11.5-8.1 8.1a5 5 0 0 1-7.1-7.1l8.5-8.5a3.3 3.3 0 0 1 4.7 4.7l-8.4 8.4a1.7 1.7 0 0 1-2.4-2.4l7.7-7.7"/>',
-  link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>'
+  link: '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/>',
+  users: '<circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 19.5c.9-3 3.4-4.8 6.5-4.8s5.6 1.8 6.5 4.8"/><path d="M15.5 5.2a3.4 3.4 0 0 1 0 6.6M17.5 14.9c2 .6 3.4 2.2 4 4.6"/>',
+  send: '<path d="M4 12 20 4l-4 16-4-6.5z"/><path d="m12 13.5 8-9.5"/>',
+  dots: '<circle cx="6" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="18" cy="12" r="1.4"/>',
+  flag: '<path d="M5.5 21V4.5M5.5 5h11l-2 4 2 4h-11"/>',
+  shield: '<path d="M12 3.5 5 6v5.5c0 4.3 3 7.8 7 9 4-1.2 7-4.7 7-9V6z"/><path d="m9 12 2.2 2.2L15.5 10"/>',
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5v-3a2 2 0 0 0-2-2h-8a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h3"/>'
 };
 function ic(n, cls) { return '<svg class="icon ' + (cls || '') + '" viewBox="0 0 24 24" aria-hidden="true">' + ICON[n] + '</svg>'; }
 
@@ -2216,13 +2250,13 @@ function atualizarChips() {
 }
 function aplicarConta(c) {
   if (!c || typeof c !== 'object' || c.saldo === undefined || !sessao) return;
-  var primeira = !CONTA;
   CONTA = c; espelharConta();
   S.conta = { rank: c.rank, cor: c.cor, nome: c.nome, num: c.num };
   if (S.perfil && S.perfil.prefs && S.perfil.prefs.paleta) delete S.perfil.prefs.paleta;
   gravarLocal(); aplicarCorRank();
   idAutomatico();
-  if (!W && !AUTH.carregando && !aEditar() && !$('#layer').innerHTML) rerender(); else atualizarChips();
+  avisoPremio(c);
+  if (!W && !AUTH.carregando && !aEditar() && !$('#layer').innerHTML) rerender(); else { atualizarChips(); renderPendente = true; }
 }
 /* Pedidos que falharam por falta de internet ficam numa fila e repetem-se (o servidor ignora repetidos). */
 function guardarFila() { try { localStorage.setItem(chaveLocal + '.fila', JSON.stringify(FILA.slice(-100))); } catch (e) {} }
@@ -2313,7 +2347,7 @@ function primeiroNome() { return ((S.perfil && S.perfil.nome) || '').trim().spli
 function cartaoRank(c) {
   var R = rankInfo(c.rank), serie = c.series && c.series[c.rank], h = Math.floor((c.foco_seg || 0) / 3600);
   return '<div class="cartao" style="--f:' + R.f + ';--c:' + R.c + ';--t:' + R.t + '" role="img" aria-label="Cartão Cumpre de ' + esc(primeiroNome()) + ', rank ' + R.n + (c.nome ? ', @' + esc(c.nome) + '#' + pad4(c.num) : '') + '">' +
-    '<div class="cartao-topo"><span class="cartao-marca">cumpre</span><span class="cartao-rank">' + R.n.toUpperCase() + '</span></div>' +
+    '<div class="cartao-topo"><span class="cartao-marca">cumpre</span><span class="cartao-rank">' + (c.verificado ? '✓ VERIFICADO · ' : '') + R.n.toUpperCase() + '</span></div>' +
     '<div><b class="cartao-nome">' + esc(primeiroNome()) + '</b><span class="cartao-id num">' + (c.nome ? '@' + esc(c.nome) + '#' + pad4(c.num) : 'Sem ID') + '</span></div>' +
     '<div class="cartao-baixo num"><span>' + (serie ? R.n.toUpperCase() + ' · N.º ' + pad4(serie) : 'Rank inicial') + '</span><span>' + plural(h, 'hora', 'horas') + ' de foco · ' + plural(c.seq_max || 0, 'dia seguido', 'dias seguidos') + ' (máx.)</span></div></div>';
 }
@@ -2332,7 +2366,7 @@ function vRank() {
     var itens = seg.itens.filter(function (i) { return !((i.k === 'dias' || i.k === 'seq') && !Number(i.pede)) && !(i.k === 'verificado' && !i.pede); });
     req = itens.map(function (i) {
       var nm = nomes[i.k];
-      if (i.k === 'verificado') return linhaReq(nm[0], i.ok, i.ok ? 'Feito' : 'Chega em breve', i.ok ? 1 : 0, 1);
+      if (i.k === 'verificado') return linhaReq(nm[0], i.ok, i.ok ? 'Feito' : '<button class="link-btn" data-a="verif-abrir">Verificar agora</button>', i.ok ? 1 : 0, 1);
       return linhaReq(nm[0], i.ok, fmtReq(i.tem) + ' de ' + fmtN(Number(i.pede)) + nm[1], Number(i.tem) || 0, Number(i.pede) || 0);
     }).join('');
     var falta = itens.filter(function (i) { return !i.ok; }).length;
@@ -2359,6 +2393,8 @@ function vEmblemas() {
       '<span class="emb-estrelas" role="img" aria-label="Nível ' + x.nivel + ' de 5">' + '★★★★★'.slice(0, x.nivel) + '<i>' + '★★★★★'.slice(x.nivel) + '</i></span>' +
       '<span class="xs muted">' + (prox ? fmtReq(x.valor) + ' de ' + fmtN(prox) + ' ' + esc(x.unid) : 'Nível máximo') + '</span></div>';
   });
+  if (CONTA.podios) L.unshift('<div class="emb on"><span class="emb-ico" aria-hidden="true">' + ic('trophy', 'sm') + '</span><b class="small">Pódio ×' + CONTA.podios + '</b><span class="emb-estrelas">★</span><span class="xs muted">Top 3 da semana na escola ou num grupo</span></div>');
+  if (CONTA.verificado) L.unshift('<div class="emb on"><span class="emb-ico" aria-hidden="true">' + ic('shield', 'sm') + '</span><b class="small">Verificado</b><span class="emb-estrelas">★</span><span class="xs muted">Email da escola confirmado</span></div>');
   if (e.fundador) L.unshift('<div class="emb on"><span class="emb-ico" aria-hidden="true">' + ic('trophy', 'sm') + '</span><b class="small">Fundador</b><span class="emb-estrelas">★</span><span class="xs muted">Entraste no primeiro ano da Cumpre</span></div>');
   return '<section class="card stack" aria-labelledby="h-emb"><h2 id="h-emb">Emblemas</h2><div class="emb-grid">' + L.join('') + '</div><p class="xs muted">Cada nível dá pontos: +10, +25, +50, +100 e +200.</p></section>';
 }
@@ -2380,6 +2416,390 @@ function janRankNovo(c) {
   var R = rankInfo(c.rank);
   abrir(cab('Agora és ' + R.n + '!', 'És o ' + fmtN(c.serie) + '.º ' + R.n + ' da Cumpre. A app passou a ter as cores do teu rank.') +
     '<div style="display:flex;justify-content:center">' + cartaoRank(c) + '</div><button class="btn lg brilho" data-a="fechar">Continuar</button>');
+}
+
+
+/* ---------- Fases 2 e 3: verificação pela escola, ranking da semana, grupos e chat (versão online) ---------- */
+var renderPendente = false;
+var GR = { lista: null, listaPed: 0, dados: {}, dadosPed: {}, chat: {}, chatPed: {}, rk: {}, rkPed: {}, mod: null, modPed: 0 };
+var URLS_CHAT = {};
+var REGRAS_CHAT = [
+  ['Respeito', 'Sem insultos, gozo, humilhação ou exclusão de colegas.'],
+  ['Sem assédio nem ameaças', 'Nem dentro nem fora da app.'],
+  ['Sem conteúdo sexual, violento ou de ódio', 'Racismo, homofobia e afins não entram.'],
+  ['A privacidade dos outros', 'Não partilhes fotos, números, moradas ou prints de conversas de alguém sem autorização.'],
+  ['Sem batota', 'Não partilhes respostas de testes durante o teste nem vendas trabalhos feitos.'],
+  ['Sem spam nem publicidade', 'Explicações só no perfil dos Mentores aprovados.'],
+  ['Não finjas ser outra pessoa', 'Nem a equipa da Cumpre.'],
+  ['Os grupos são para estudar', 'Conversar é bem-vindo, mas o foco é estudar juntos.']
+];
+var MOTIVOS_DEN = [['insulto', 'Insulto ou gozo'], ['assedio', 'Assédio ou ameaça'], ['sexual', 'Conteúdo sexual'], ['odio', 'Ódio (racismo, homofobia…)'], ['privacidade', 'Partilha de dados ou fotos de alguém'], ['batota', 'Batota'], ['spam', 'Spam ou publicidade'], ['outro', 'Outra coisa']];
+function chatEstado() { return (CONTA && CONTA.chat) || {}; }
+function regrasGrupos() { return (CONTA && CONTA.grupos_regras) || {}; }
+function rankMin(k) { var R = regrasGrupos(); var v = R.lancamento ? R[k + '_lanc'] : R[k]; return v == null ? (k === 'criar' ? 2 : 1) : Number(v); }
+function fmtDataHora(t) { var d = new Date(t); return d.getDate() + ' ' + MESES[d.getMonth()] + ' às ' + pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function fmtHM(t) { var d = new Date(t); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+function nomeId(a) { return a && a.nome ? '@' + esc(a.nome) + '<span class="muted">#' + pad4(a.num) + '</span>' : 'Aluno sem ID'; }
+function bolaRank(a) { var R = rankInfo(a && a.cor); return '<i class="bola-rank" style="--f:' + R.f + ';--c:' + R.c + '" title="' + R.n + '" aria-hidden="true"></i>'; }
+function codigoFmt(c) { return c ? c.slice(0, 4) + '-' + c.slice(4) : ''; }
+function carregando() { return '<p class="small muted">A carregar…</p>'; }
+function rerenderSeguro() { if (!W && S.perfil && !aEditar() && !$('#layer').innerHTML) rerender(); else renderPendente = true; }
+function objetivosApagar(L) { if (srvOn() && L.length) rpc('objetivos_apagar', { p_oids: L }).then(null, function () {}); }
+function avisoPremio(c) {
+  var p = c && c.premio; if (!p || !p.semana) return;
+  var k = 'cumpre.premio.' + (sessao ? sessao.id : '') + '.' + p.semana;
+  try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) { return; }
+  if (Date.now() - parseISO(p.semana).getTime() > 15 * 86400000) return;
+  setTimeout(function () { toast('Prémio da semana: +' + p.pts + ' pontos · ' + p.motivo); }, 1500);
+}
+/* Estudar muito é bom, mas sem noitadas: se passa 6 h por dia 5 dias seguidos, lembramos as pausas (uma vez por dia). */
+function avisoSaude() {
+  var d = today(), ok = true;
+  for (var i = 0; i < 5; i++) if (minutosDia(addDays(d, -i)) < 360) { ok = false; break; }
+  if (!ok) return;
+  var k = 'cumpre.saude.' + d;
+  try { if (localStorage.getItem(k)) return; localStorage.setItem(k, '1'); } catch (e) {}
+  setTimeout(function () { toast('Estudaste mais de 6 horas por dia nos últimos 5 dias. Faz pausas e dorme bem: também conta para as notas.'); }, 3500);
+}
+
+/* ---------- Verificação pelo email da escola ---------- */
+function vVerificacao() {
+  var v = (CONTA && CONTA.verificacao) || { estado: 'nenhum' }, e = v.estado, corpo, btn = '';
+  if (e === 'verificado') {
+    corpo = '<p class="small" style="font-weight:600">' + ic('shield', 'sm') + ' Verificado' + (v.escola ? ' · ' + esc(v.escola) : '') + '</p><p class="xs muted">' + esc(v.email || '') + (v.valido_ate ? ' · válido até ' + fmtDia(v.valido_ate) + ' ' + parseISO(v.valido_ate).getFullYear() : '') + '. Em setembro pedimos que confirmes outra vez.</p>';
+    btn = '<button class="btn quiet sm" data-a="verif-remover">Remover</button>';
+  } else if (e === 'por verificar') {
+    corpo = '<p class="small">Código certo. Ainda estamos a confirmar que <b>' + esc((v.email || '').split('@')[1] || '') + '</b> é um email de escola. O selo aparece assim que confirmarmos (normalmente em 1 dia).</p>';
+  } else {
+    corpo = '<p class="small">' + (e === 'expirado' ? 'A tua verificação acabou em setembro. Verifica outra vez para manteres o selo.' : e === 'recusado' ? 'Esse email não é de uma escola. Usa o email que a tua escola te deu.' : 'Confirma que és aluno com o email que a tua escola te deu. Ganhas o selo ✓, entras no ranking da tua escola, e é preciso para Diamante e Mentor.') + '</p>';
+    btn = '<button class="btn sm" data-a="verif-abrir">' + (v.codigo_pendente ? 'Escrever o código' : 'Verificar') + '</button>';
+  }
+  return '<section class="card stack"><div class="section-head"><h2>Email da escola</h2>' + btn + '</div>' + corpo + '</section>';
+}
+function janVerificar(passo, email) {
+  var v = (CONTA && CONTA.verificacao) || {};
+  if (passo === 'codigo' || (!passo && v.codigo_pendente)) {
+    abrir(cab('Escreve o código', 'Enviámos 6 algarismos para ' + (email || v.email || 'o email da escola') + '. Pode demorar um minuto; vê também o spam.') +
+      '<form class="stack" data-f="verif-codigo" novalidate><div class="field"><label for="vc">Código</label><input class="input num" id="vc" inputmode="numeric" autocomplete="one-time-code" maxlength="7" style="font-size:24px;letter-spacing:6px"></div>' +
+      '<p class="err" id="vc-err" role="alert" hidden></p><button class="btn" type="submit">Confirmar</button><button class="link-btn" type="button" data-a="verif-outro" style="align-self:flex-start">Usar outro email ou pedir um código novo</button></form>', '#vc');
+    return;
+  }
+  abrir(cab('Verificar o email da escola', 'Enviamos um código para o email que a escola te deu. Emails pessoais (Gmail, Hotmail…) não servem.') +
+    '<form class="stack" data-f="verif-email" novalidate><div class="field"><label for="ve">Email da escola</label><input class="input" id="ve" type="email" autocomplete="email" placeholder="nome@alunos.escola.pt"></div>' +
+    '<p class="xs muted">Usamos o email só para confirmar a escola. Os outros alunos nunca o veem. Podes pedir até 3 códigos por dia.</p><p class="err" id="ve-err" role="alert" hidden></p><button class="btn" type="submit">Enviar código</button></form>', '#ve');
+}
+function vEquipa() {
+  if (!CONTA || !CONTA.admin) return '';
+  return '<section class="card stack"><div class="section-head"><h2>Equipa da Cumpre</h2></div><p class="small muted">Denúncias, recursos e domínios de escolas à espera de decisão.</p><button class="btn ghost sm" data-a="nav" data-v="moderacao" style="align-self:flex-start">' + ic('shield', 'sm') + 'Abrir o painel de moderação</button></section>';
+}
+
+/* ---------- Ranking da semana ---------- */
+function chaveRk(amb, q, grupo) { return (grupo ? 'g' + grupo : amb) + ':' + q; }
+function carregarRanking(amb, q, grupo) {
+  var key = chaveRk(amb, q, grupo);
+  if (GR.rkPed[key] && Date.now() - GR.rkPed[key] < 60000) return;
+  GR.rkPed[key] = Date.now();
+  rpc('ranking_semana', { p_ambito: amb, p_quadro: q, p_grupo: grupo || null }).then(function (d) { GR.rk[key] = d; rerenderSeguro(); }, function () { GR.rkPed[key] = 0; });
+}
+function listaRanking(d, q) {
+  if (!d.itens || !d.itens.length) return '<p class="small muted">' + (q === 'horas' ? 'Ainda ninguém estudou com o temporizador esta semana. Sê o primeiro!' : 'Ainda ninguém tem 5 objetivos esta semana. Junta tarefas e temas e cumpre-os.') + '</p>';
+  return '<ol class="rk">' + d.itens.map(function (x) {
+    return '<li class="rk-li' + (x.eu ? ' eu' : '') + '"><span class="rk-pos num">' + x.pos + '</span>' + bolaRank(x) + '<span class="grow small">' + nomeId(x) + (x.eu ? ' <b>(tu)</b>' : '') + '</span><b class="num small">' + (q === 'horas' ? fmtMin(Math.round(x.valor / 60)) : x.valor + '%') + '</b></li>';
+  }).join('') + '</ol>';
+}
+function segBotoes(acao, atual, L, rot) {
+  return '<div class="seg" role="group" aria-label="' + rot + '">' + L.map(function (x) { return '<button data-a="' + acao + '" data-k="' + x[0] + '" aria-pressed="' + (atual === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>';
+}
+function vRankingSemana() {
+  if (!CONTA) return '';
+  var amb = UI.rkAmb || 'escola', q = UI.rkQ || 'horas', d = GR.rk[chaveRk(amb, q)];
+  if (!d) carregarRanking(amb, q);
+  var corpo;
+  if (!d) corpo = carregando();
+  else if (d.erro === 'verificar') corpo = '<p class="small">O ranking da escola é só com alunos verificados, para ser justo.</p><button class="btn sm" data-a="verif-abrir" style="align-self:flex-start">Verificar o email da escola</button>';
+  else if (amb === 'escola' && d.populacao < 10) corpo = '<p class="small muted">Ainda há ' + plural(d.populacao, 'aluno verificado', 'alunos verificados') + ' do teu ano' + (d.escola ? ' em ' + esc(d.escola) : '') + '. O ranking da escola aparece a partir de 10: convida os teus colegas!</p>';
+  else corpo = listaRanking(d, q);
+  return '<section class="card stack" aria-labelledby="h-rks"><div class="section-head"><h2 id="h-rks">Ranking da semana</h2><span class="xs muted">Recomeça à segunda</span></div>' +
+    '<div class="row wrap between" style="gap:8px">' + segBotoes('rk-amb', amb, [['escola', 'A minha escola'], ['nacional', 'Nacional']], 'Onde') + segBotoes('rk-q', q, [['horas', 'Horas'], ['cumprimento', 'Cumprimento']], 'Quadro') + '</div>' +
+    corpo +
+    '<p class="xs muted">' + (q === 'horas' ? 'Horas de foco desta semana, até 8 h por dia. As sessões começadas entre a 1:00 e as 6:00 não contam.' : 'Percentagem dos teus objetivos desta semana (e dos que vinham da anterior) que cumpriste. Conta a partir de 5 objetivos.') +
+      (amb === 'escola' ? ' Os 3 primeiros em horas ganham 100, 60 e 40 pontos; o top 10 % ganha 20.' : ' O nacional mostra só o ID e o rank, nunca a escola.') + '</p>' +
+    '<button class="link-btn" data-a="rk-esconder" style="align-self:flex-start">' + (CONTA.esconder ? 'Voltar a aparecer nos rankings' : 'Esconder-me dos rankings') + '</button></section>';
+}
+
+/* ---------- Grupos ---------- */
+function carregarGrupos() {
+  GR.listaPed = Date.now();
+  rpc('grupos_meus', {}).then(function (L) { GR.lista = L || []; if (UI.view === 'grupos') rerenderSeguro(); }, function () { GR.listaPed = 0; });
+}
+function carregarGrupo(id) {
+  GR.dadosPed[id] = Date.now();
+  rpc('grupo_ver', { p_grupo: id }).then(function (d) { GR.dados[id] = d; if (UI.view === 'grupo' && UI.grupo === id) rerenderSeguro(); }, function () { GR.dadosPed[id] = 0; });
+}
+function bannerSancao() {
+  var ce = chatEstado(); if (!ce.banido && !ce.ate) return '';
+  var s = ce.sancao || {};
+  return '<div class="notice aviso" role="status">' + ic('lock') + '<span class="grow">' + (ce.banido ? 'A tua conta já não pode escrever nos grupos.' : 'Não podes escrever nos grupos até ' + fmtDataHora(ce.ate) + '.') + (s.motivo ? ' Motivo: ' + esc(s.motivo) : '') + '</span>' +
+    (s.id && !s.recurso ? '<button class="btn sm ghost" data-a="recorrer" data-id="' + s.id + '">Recorrer</button>' : s.recurso === 'pendente' ? '<span class="xs">Recurso em análise</span>' : '') + '</div>';
+}
+function itemGrupo(g) {
+  return '<button class="grupo-li" data-a="grupo-abrir" data-id="' + g.id + '"><span class="tile-ico" style="background:var(--sand);color:var(--ink)">' + ic('users') + '</span><span class="grow"><b style="display:block">' + esc(g.nome) + '</b>' +
+    '<span class="xs muted prev">' + (g.estado === 'pendente' ? 'À espera de ser aceite' : plural(g.membros, 'pessoa', 'pessoas') + (g.a_estudar ? ' · ' + g.a_estudar + ' a estudar agora' : '') + (g.ultima ? ' · ' + esc(g.ultima.texto || 'foto ou ficheiro') : '')) + '</span></span>' +
+    (g.novas ? '<span class="badge-n" aria-label="' + g.novas + ' mensagens novas">' + (g.novas > 99 ? '99+' : g.novas) + '</span>' : '') + ic('arrowR', 'sm') + '</button>';
+}
+function vGrupos() {
+  var head = '<div class="page-head"><div class="stack" style="gap:2px"><h1>Grupos</h1><span class="muted small">Estuda com os teus colegas. Só se entra com o código do grupo.</span></div></div>';
+  if (!CONTA) return head + carregando();
+  if (!GR.listaPed || Date.now() - GR.listaPed > 20000) carregarGrupos();
+  var ce = chatEstado(), R = regrasGrupos(), r = CONTA.rank, minE = rankMin('entrar'), minC = rankMin('criar');
+  var tam = R.tamanho ? R.tamanho[r] : 15, idade = CONTA.idade || 0;
+  var regras = ce.regras ? '' : '<section class="card stack"><h2>Antes de começares</h2><p class="small">Os grupos e o chat têm 8 regras para serem um sítio bom para estudar. Lê-as uma vez e aceita-as.</p><button class="btn" data-a="regras-chat" style="align-self:flex-start">Ler as regras</button></section>';
+  var entrar = '<section class="card stack"><h2>Entrar num grupo</h2>' + (r < minE ? '<p class="small muted">Para entrar em grupos precisas de chegar a ' + rankInfo(minE).n + ' (5 horas de foco). Estás quase!</p>' :
+    '<form class="row" data-f="grupo-entrar" novalidate><label for="g-cod" class="sr">Código do grupo</label><input class="input grow num" id="g-cod" placeholder="Ex.: K7QM-4RTW" maxlength="9" autocapitalize="characters" autocomplete="off" spellcheck="false" style="text-transform:uppercase"><button class="btn" type="submit">Entrar</button></form><p class="err" id="g-cod-err" role="alert" hidden></p><p class="xs muted">Pede o código a quem criou o grupo.</p>') + '</section>';
+  var criar = '<section class="card stack"><h2>Criar um grupo</h2>' + (r < minC ? '<p class="small muted">Criar grupos é a partir de ' + rankInfo(minC).n + '. Assim os grupos são de quem estuda mesmo.</p>' :
+    '<form class="row" data-f="grupo-criar" novalidate><label for="g-nome" class="sr">Nome do grupo</label><input class="input grow" id="g-nome" placeholder="Ex.: 12.º B · Matemática" maxlength="40"><button class="btn ghost" type="submit">Criar</button></form><p class="err" id="g-nome-err" role="alert" hidden></p>' +
+    '<p class="xs muted">Até ' + tam + ' pessoas. ' + (idade < 18 ? 'Como tens menos de 18 anos, o grupo é só para alunos com menos de 18.' : 'Alunos com menos de 18 anos não podem entrar em grupos de adultos.') + '</p>') + '</section>';
+  var L = GR.lista, lista = L === null ? carregando() : !L.length ? '<p class="small muted">Ainda não estás em nenhum grupo.</p>' : '<div>' + L.map(itemGrupo).join('') + '</div>';
+  return head + bannerSancao() + regras + '<div class="grid2">' + entrar + criar + '</div>' +
+    '<section class="card stack"><h2>Os teus grupos</h2>' + lista + '</section>' +
+    '<p class="xs muted">' + (idade < 13 ? 'O chat é a partir dos 13 anos: nos grupos podes ver o ranking e estudar com os outros. ' : '') + '<button class="link-btn" data-a="regras-chat">Regras do chat</button> · <button class="link-btn" data-a="sancoes-ver">Avisos e sanções</button></p>';
+}
+function vGrupo() {
+  var id = UI.grupo, d = GR.dados[id];
+  var back = '<button class="link-btn" data-a="nav" data-v="grupos" style="display:inline-flex;gap:6px;align-items:center;text-decoration:none;align-self:flex-start">' + ic('arrowL', 'sm') + 'Grupos</button>';
+  if (!GR.dadosPed[id] || Date.now() - GR.dadosPed[id] > 30000) carregarGrupo(id);
+  if (!d) return back + carregando();
+  if (!d.ok) return back + '<p class="muted">' + esc(d.erro || 'Este grupo já não existe.') + '</p>';
+  if (d.pendente) return back + '<h1>' + esc(d.nome) + '</h1><p class="muted">O teu pedido para entrar está à espera que quem criou o grupo o aceite.</p>';
+  var ce = chatEstado(), podeChat = ce.pode_chat !== false;
+  var tab = UI.grupoTab || (podeChat ? 'chat' : 'ranking');
+  var T = (podeChat ? [['chat', 'Chat']] : []).concat([['ranking', 'Ranking'], ['membros', 'Membros']]);
+  var nMembros = (d.membros || []).filter(function (m) { return m.estado === 'ativo'; }).length;
+  return back +
+    '<div class="page-head"><div class="stack" style="gap:4px"><h1>' + esc(d.nome) + '</h1><span class="muted small">' + plural(nMembros, 'pessoa', 'pessoas') + ' de ' + d.max + (d.faixa === 'menores' ? ' · grupo de menores de 18' : '') + '</span></div>' +
+      '<button class="codigo-chip" data-a="grupo-codigo" aria-label="Copiar o código do grupo ' + codigoFmt(d.codigo) + '">' + ic('copy', 'sm') + codigoFmt(d.codigo) + '</button></div>' +
+    bannerSancao() + vSala(d) +
+    '<div class="tabs-g">' + segBotoes('grupo-tab', tab, T, 'Secção do grupo') + '</div>' +
+    (tab === 'chat' && podeChat ? vChat(d) : tab === 'membros' ? vMembros(d) : vRankGrupo(d));
+}
+function vSala(d) {
+  var a = (d.membros || []).filter(function (m) { return m.a_estudar; }), s = d.sala, agora = Date.now();
+  var quem = a.length ? '<p class="small"><b>A estudar agora:</b> ' + a.map(function (m) { return nomeId(m); }).join(', ') + '</p>' : '<p class="small muted">Ninguém está a estudar neste momento.</p>';
+  var acao;
+  if (s && Date.parse(s.fim) > agora) {
+    var falta = Math.max(1, Math.round((Date.parse(s.fim) - agora) / 60000));
+    acao = '<p class="small">Sala aberta' + (s.por && s.por.nome ? ' por @' + esc(s.por.nome) : '') + ': ' + s.dur + ' min, acaba às ' + fmtHM(Date.parse(s.fim)) + '.</p><button class="btn brilho" data-a="sala-entrar" data-min="' + falta + '" style="align-self:flex-start">' + ic('play', 'sm') + 'Estudar com eles (' + falta + ' min)</button>';
+  } else acao = '<div class="row wrap" style="gap:8px"><button class="btn ghost sm" data-a="sala-abrir" data-dur="25">' + ic('play', 'sm') + 'Abrir sala de 25 min</button><button class="btn ghost sm" data-a="sala-abrir" data-dur="50">50 min</button></div>';
+  return '<section class="card stack" aria-labelledby="h-sala"><h2 id="h-sala">Estudar juntos</h2>' + quem + acao + '<p class="xs muted">Cada um estuda no seu modo foco, ao mesmo tempo. As horas contam para o rank e para o ranking do grupo.</p></section>';
+}
+function abrirSala(dur) {
+  if (S.timer) { toast('Já tens uma sessão de estudo a decorrer.'); return; }
+  rpc('grupo_sala', { p_grupo: UI.grupo, p_dur: dur }).then(function (d) {
+    if (d && d.ok) { GR.dados[UI.grupo] = d; var s = d.sala; entrarSala(s ? Math.max(1, Math.round((Date.parse(s.fim) - Date.now()) / 60000)) : dur); }
+    else toast((d && d.erro) || 'Não deu para abrir a sala.');
+  }, function () { toast('Sem ligação à internet. Tenta outra vez.'); });
+}
+function entrarSala(min) {
+  if (S.timer) { toast('Já tens uma sessão de estudo a decorrer.'); return; }
+  var disc = discSugerida() || (S.disciplinas[0] && S.disciplinas[0].id);
+  if (!disc) { toast('Junta primeiro uma disciplina em Pastas.'); return; }
+  A.estudar({ dataset: { d: disc, dur: String(Math.max(5, Math.min(120, min))) } });
+}
+function vRankGrupo(d) {
+  var q = UI.rkGQ || 'horas', key = chaveRk('grupo', q, d.id), r = GR.rk[key];
+  if (!r) carregarRanking('grupo', q, d.id);
+  return '<section class="card stack"><div class="row wrap between"><h2>Ranking da semana</h2>' + segBotoes('rkg-q', q, [['horas', 'Horas'], ['cumprimento', 'Cumprimento']], 'Quadro') + '</div>' +
+    (r ? listaRanking(r, q) : carregando()) + '<p class="xs muted">Em grupos com 10 ou mais pessoas, os 3 primeiros em horas ganham 100, 60 e 40 pontos à segunda-feira.</p></section>';
+}
+function vMembros(d) {
+  var dono = d.papel === 'dono', M = d.membros || [];
+  var pend = M.filter(function (m) { return m.estado === 'pendente'; }), at = M.filter(function (m) { return m.estado === 'ativo'; });
+  var linha = function (m) {
+    var acoes = dono && !m.eu ? (m.estado === 'pendente' ? '<button class="btn sm" data-a="grupo-gerir" data-acao="aprovar" data-u="' + m.id + '">Aceitar</button><button class="btn quiet sm" data-a="grupo-gerir" data-acao="recusar" data-u="' + m.id + '">Recusar</button>'
+      : '<button class="btn quiet sm" data-a="grupo-gerir" data-acao="silenciar" data-u="' + m.id + '"' + (m.silenciado ? ' disabled' : '') + '>' + (m.silenciado ? 'Silenciado' : 'Silenciar 24 h') + '</button><button class="btn quiet sm" data-a="grupo-gerir" data-acao="remover" data-u="' + m.id + '">Remover</button>') : '';
+    return '<div class="li" style="padding:10px 0;flex-wrap:wrap;gap:8px">' + bolaRank(m) + '<span class="grow small" style="min-width:140px">' + nomeId(m) + (m.eu ? ' <b>(tu)</b>' : '') + '<span class="xs muted" style="display:block">' + rankInfo(m.rank).n + (m.papel === 'dono' ? ' · criou o grupo' : '') + (m.a_estudar ? ' · a estudar agora' : '') + '</span></span>' + acoes + '</div>';
+  };
+  var gerir = dono ? '<section class="card stack"><h2>Gerir o grupo</h2><div class="row wrap" style="gap:8px"><button class="btn ghost sm" data-a="grupo-gerir" data-acao="codigo">Código novo</button><button class="btn ghost sm" data-a="grupo-gerir" data-acao="codigo" data-v="24h">Código que dura 24 h</button><button class="btn ghost sm" data-a="grupo-gerir" data-acao="codigo" data-v="7d">Código que dura 7 dias</button></div>' +
+      '<p class="xs muted">Um código novo faz o antigo deixar de funcionar.' + (d.codigo_expira ? ' O código atual acaba a ' + fmtDataHora(d.codigo_expira) + '.' : '') + '</p>' +
+      '<button class="btn ghost sm" data-a="grupo-gerir" data-acao="aprovacao" data-v="' + (!d.aprovacao) + '" aria-pressed="' + d.aprovacao + '" style="align-self:flex-start">' + (d.aprovacao ? ic('check', 'sm') + 'Tenho de aceitar quem entra' : 'Aceitar cada pessoa antes de entrar') + '</button></section>' : '';
+  return (pend.length && dono ? '<section class="card stack"><h2>À espera de entrar</h2>' + pend.map(linha).join('') + '</section>' : '') +
+    '<section class="card stack"><h2>Membros</h2><div>' + at.map(linha).join('') + '</div></section>' + gerir +
+    '<button class="btn quiet sm" data-a="grupo-sair" style="align-self:flex-start">Sair do grupo</button>';
+}
+function gerirGrupo(acao, u, v) {
+  rpc('grupo_gerir', { p_grupo: UI.grupo, p_acao: acao, p_user: u, p_valor: v }).then(function (d) {
+    if (d && d.ok === false && d.erro) { toast(d.erro); return; }
+    GR.dados[UI.grupo] = d; rerender();
+    toast(acao === 'codigo' ? 'Código novo: ' + codigoFmt(d.codigo) : acao === 'aprovar' ? 'Aceite.' : acao === 'remover' ? 'Removido do grupo.' : acao === 'silenciar' ? 'Silenciado por 24 horas.' : 'Guardado.');
+  }, function () { toast('Sem ligação à internet. Tenta outra vez.'); });
+}
+function partilharCodigo() {
+  var d = GR.dados[UI.grupo]; if (!d || !d.codigo) return;
+  var txt = 'Junta-te ao grupo "' + d.nome + '" na Cumpre (app.cumpre.pt). Código: ' + codigoFmt(d.codigo);
+  if (navigator.share) { navigator.share({ text: txt }).catch(function () {}); return; }
+  if (navigator.clipboard) navigator.clipboard.writeText(txt).then(function () { toast('Código copiado: ' + codigoFmt(d.codigo)); }, function () { toast('Código: ' + codigoFmt(d.codigo)); });
+  else toast('Código: ' + codigoFmt(d.codigo));
+}
+
+/* ---------- Chat ---------- */
+function linkificar(t) {
+  return esc(t).replace(/\bhttps?:\/\/[^\s<]+[^\s<.,;:!?)\]'"]/g, function (u) { return '<a href="' + u + '" target="_blank" rel="noopener noreferrer nofollow">' + u + '</a>'; });
+}
+function htmlMsg(m) {
+  var corpo = m.estado === 'apagada' ? '<i class="muted">Mensagem apagada</i>' : m.estado === 'escondida' ? '<i class="muted">Mensagem escondida enquanto é revista</i>'
+    : (m.texto ? linkificar(m.texto) : '') + (m.anexo ? (/^image\//.test(m.anexo.tipo) ? '<img class="msg-img" data-chat-img="' + esc(m.anexo.path) + '" alt="Foto enviada por ' + esc((m.autor && m.autor.nome) || 'um colega') + '">' : '<button class="btn ghost sm" data-a="chat-pdf" data-p="' + esc(m.anexo.path) + '" style="margin-top:6px">' + ic('doc', 'sm') + esc(m.anexo.nome || 'PDF') + '</button>') : '');
+  return '<div class="msg' + (m.eu ? ' eu' : '') + '" data-mid="' + m.id + '"><div class="msg-topo">' + bolaRank(m.autor) + '<span class="xs">' + nomeId(m.autor) + '</span><span class="xs muted num">' + fmtHM(m.t) + '</span>' +
+    (m.estado ? '' : '<button class="msg-mais" data-a="msg-menu" data-id="' + m.id + '" aria-label="Opções da mensagem">' + ic('dots', 'sm') + '</button>') + '</div><div class="msg-corpo">' + corpo + '</div></div>';
+}
+function htmlMsgs(id) {
+  var L = GR.chat[id];
+  if (!L) return carregando();
+  if (!L.length) return '<p class="small muted" style="margin:auto;text-align:center">Ainda não há mensagens. Diz olá e combinem quando estudar!</p>';
+  return L.map(htmlMsg).join('');
+}
+function vChat(d) {
+  var ce = chatEstado(), id = d.id, bloq = ce.banido || ce.ate || !ce.regras;
+  if (!GR.chat[id]) carregarChat(id);
+  var form = !ce.regras ? '<div class="notice">' + ic('flag') + '<span class="grow">Para escrever, lê e aceita as regras do chat.</span><button class="btn sm" data-a="regras-chat">Ler as regras</button></div>'
+    : bloq ? '' : '<form class="chat-form" data-f="chat" data-id="' + id + '" novalidate>' + (ce.anexos ? '<button type="button" class="icon-btn" data-a="chat-anexo" aria-label="Juntar uma foto ou um PDF">' + ic('clip') + '</button>' : '') +
+      '<label for="chat-txt" class="sr">Mensagem</label><textarea class="input grow" id="chat-txt" rows="1" maxlength="1000" placeholder="Escreve uma mensagem"></textarea><button class="btn" type="submit" aria-label="Enviar">' + ic('send', 'sm') + '</button></form>';
+  return '<section class="card chat" aria-label="Chat do grupo"><div class="chat-lista" id="chat-lista">' + htmlMsgs(id) + '</div>' + form +
+    '<p class="xs muted">' + (ce.links === 'nenhum' ? 'Até aos 15 anos o chat é só de texto. ' : ce.links === 'confianca' ? 'Aos 16 e 17 anos só dá para links de sites de estudo, da escola, Google Drive e YouTube. ' : '') + 'Não partilhes números, moradas nem fotos de ninguém. <button class="link-btn" data-a="regras-chat">Regras</button></p></section>';
+}
+function posChat() {
+  var el = $('#chat-lista'); if (!el) return;
+  el.scrollTop = el.scrollHeight;
+  encherImagens(el);
+}
+function pintarChat(id, fundo) {
+  var el = $('#chat-lista'); if (!el || UI.view !== 'grupo' || UI.grupo !== id) return;
+  var noFim = el.scrollHeight - el.scrollTop - el.clientHeight < 90;
+  el.innerHTML = htmlMsgs(id);
+  encherImagens(el);
+  if (fundo || noFim) el.scrollTop = el.scrollHeight;
+}
+function urlChat(path) {
+  if (!URLS_CHAT[path]) URLS_CHAT[path] = Promise.resolve(supa.storage.from('chat').createSignedUrl(path, 3600)).then(function (r) { return r && r.data ? r.data.signedUrl : null; }, function () { delete URLS_CHAT[path]; return null; });
+  return URLS_CHAT[path];
+}
+function encherImagens(el) {
+  (el || document).querySelectorAll('img[data-chat-img]:not([src])').forEach(function (img) { urlChat(img.getAttribute('data-chat-img')).then(function (u) { if (u) img.src = u; }); });
+}
+function carregarChat(id, forcar) {
+  if (!srvOn() || !id || (GR.chatPed[id] && !forcar)) return;
+  GR.chatPed[id] = 1;
+  var L0 = GR.chat[id], depois = L0 && L0.length ? L0[L0.length - 1].id : null;
+  rpc('chat_listar', { p_grupo: id, p_depois: depois, p_antes: null }).then(function (r) {
+    GR.chatPed[id] = 0;
+    if (!r || !r.ok) { GR.chat[id] = GR.chat[id] || []; if (r && r.erro) { toast(r.erro); delete GR.dados[id]; } pintarChat(id); return; }
+    var primeira = !GR.chat[id], L = GR.chat[id] || [], mud = {}, ids = {};
+    (r.mudadas || []).forEach(function (m) { mud[m.id] = m; });
+    L = L.map(function (m) { ids[m.id] = 1; return mud[m.id] || m; });
+    var novas = r.mensagens.filter(function (m) { return !ids[m.id]; });
+    GR.chat[id] = L.concat(novas).slice(-300);
+    if (r.chat && CONTA) CONTA.chat = r.chat;
+    if (primeira || novas.length || (r.mudadas || []).length) pintarChat(id, primeira);
+  }, function () { GR.chatPed[id] = 0; });
+}
+setInterval(function () {
+  if (!srvOn() || document.visibilityState !== 'visible') return;
+  if (UI.view === 'grupo' && UI.grupo && GR.chat[UI.grupo] && (UI.grupoTab || 'chat') === 'chat') carregarChat(UI.grupo);
+  if (UI.view === 'grupo' && UI.grupo && Date.now() - (GR.dadosPed[UI.grupo] || 0) > 30000) carregarGrupo(UI.grupo);
+  if (UI.view === 'grupos' && Date.now() - (GR.listaPed || 0) > 20000) carregarGrupos();
+}, 4000);
+function enviarMsg(id, txt, anexo) {
+  return rpc('chat_enviar', { p_grupo: id, p_texto: txt, p_anexo: anexo }).then(function (r) {
+    if (!r.ok) { if (r.erro === 'regras') janRegrasChat(true); else toast(r.erro || 'A mensagem não foi enviada.'); if (r.bloqueada) chamar('conta_estado', {}); return false; }
+    var L = GR.chat[id] = GR.chat[id] || [];
+    if (!L.some(function (m) { return m.id === r.mensagem.id; })) L.push(r.mensagem);
+    pintarChat(id, true);
+    return true;
+  }, function () { toast('Sem ligação à internet. A mensagem não foi enviada.'); return false; });
+}
+function subirChat(f, id) {
+  var tipo = tipoFicheiro(f);
+  if (!tipo) { toast('Só dá para enviar fotos ou PDF.'); return; }
+  if (tipo === 'application/pdf' && f.size > 5 * 1048576) { toast('O PDF tem mais de 5 MB.'); return; }
+  toast('A enviar…');
+  var prep = tipo === 'application/pdf' ? Promise.resolve({ blob: f, tipo: tipo }) : prepararImagem(f, tipo);
+  prep.then(function (r) {
+    var ext = EXT[r.tipo];
+    if (['jpg', 'png', 'webp', 'pdf'].indexOf(ext) < 0) throw { code: 'unsupported_type' };
+    if (r.blob.size > 5 * 1048576) throw { code: 'too_large' };
+    var path = sessao.id + '/' + id + '/' + uid() + '.' + ext;
+    return Promise.resolve(supa.storage.from('chat').upload(path, r.blob, { contentType: r.tipo, cacheControl: '3600', upsert: false })).then(function (u) {
+      if (u && u.error) throw codigoStorage(u.error);
+      return enviarMsg(id, '', { path: path, tipo: r.tipo, nome: f.name });
+    });
+  }).catch(function (e) { toast(msgErroFicheiro(e, f.name)); });
+}
+function marcarMsg(id, estado) {
+  var L = GR.chat[UI.grupo] || [];
+  L.forEach(function (m) { if (m.id === id) { m.estado = estado; m.texto = ''; m.anexo = null; } });
+  pintarChat(UI.grupo);
+}
+function janMsg(id) {
+  var m = (GR.chat[UI.grupo] || []).find(function (x) { return x.id === id; }); if (!m) return;
+  abrir(cab('Mensagem', (m.autor && m.autor.nome ? '@' + m.autor.nome : '') + ' · ' + fmtDataHora(m.t)) +
+    '<div class="stack">' + (m.eu ? '<button class="btn ghost" data-a="msg-apagar" data-id="' + id + '">' + ic('trash', 'sm') + 'Apagar a mensagem</button>'
+      : '<button class="btn ghost" data-a="msg-denunciar" data-id="' + id + '">' + ic('flag', 'sm') + 'Denunciar</button>') + '<button class="btn quiet" data-a="fechar">Cancelar</button></div>');
+}
+function janDenunciar(id) {
+  abrir(cab('Denunciar a mensagem', 'A denúncia é anónima: quem escreveu não sabe quem denunciou. Com 3 denúncias a mensagem fica escondida até ser revista.') +
+    '<form class="stack" data-f="denuncia" data-id="' + id + '" novalidate><fieldset class="stack" style="border:0;padding:0;margin:0;gap:6px"><legend class="small" style="font-weight:600;margin-bottom:6px">O que se passa?</legend>' +
+    MOTIVOS_DEN.map(function (x) { return '<label class="check"><input type="radio" name="den" value="' + x[0] + '"><span>' + x[1] + '</span></label>'; }).join('') + '</fieldset>' +
+    '<div class="notice">' + ic('shield') + '<span>Se alguém te está a fazer mal, fala com um adulto de confiança. Podes também ligar para a Linha Internet Segura: <b>800 21 90 90</b> (grátis) ou ir a <a href="https://www.internetsegura.pt" target="_blank" rel="noopener">internetsegura.pt</a>.</span></div>' +
+    '<p class="err" id="den-err" role="alert" hidden></p><button class="btn" type="submit">Enviar denúncia</button></form>');
+}
+function janRegrasChat(pedir) {
+  var ce = chatEstado();
+  abrir(cab('Regras do chat', 'Valem para todos os grupos da Cumpre.') +
+    '<ol class="stack" style="margin:0;padding-left:20px;gap:8px">' + REGRAS_CHAT.map(function (r) { return '<li><b>' + r[0] + '.</b> <span class="small">' + r[1] + '</span></li>'; }).join('') + '</ol>' +
+    '<h3>Se não cumprires</h3><p class="small">Leve (spam, linguagem imprópria): aviso → 24 h sem escrever → 7 dias → 30 dias fora do chat. Média (insulto, partilhar prints, batota): 24 h → 7 dias → 30 dias → conta banida do chat. Grave (assédio, ódio, ameaça, conteúdo sexual): 30 dias fora e revisão → conta banida. Gravíssima: conta banida de imediato e comunicação às autoridades.</p>' +
+    '<p class="xs muted">As infrações contam durante 6 meses. Vês sempre porquê foste sancionado e podes recorrer uma vez. Uma sanção não te tira pontos nem rank.</p>' +
+    '<h3>Idades</h3><p class="small">Menos de 13: sem chat (podes estar nos grupos para estudar e ver o ranking). 13 a 15: só texto. 16 e 17: fotos e PDF, e links de sites de estudo. 18 ou mais: tudo. Menores e adultos não ficam no mesmo grupo, a não ser colegas verificados da mesma escola. Não há mensagens privadas.</p>' +
+    (ce.regras ? '<button class="btn" data-a="fechar">Fechar</button>' : '<button class="btn" data-a="regras-aceitar">Li e aceito as regras</button>' + (pedir ? '<p class="xs muted">Precisas de aceitar as regras para usar os grupos.</p>' : '')));
+}
+function janRecorrer(id) {
+  abrir(cab('Recorrer da sanção', 'Podes recorrer uma vez. A equipa da Cumpre responde em 72 horas.') +
+    '<form class="stack" data-f="recurso" data-id="' + id + '" novalidate><div class="field"><label for="rec-txt">Porque achas que está errada?</label><textarea class="input" id="rec-txt" rows="4" maxlength="1000"></textarea></div><p class="err" id="rec-err" role="alert" hidden></p><button class="btn" type="submit">Enviar recurso</button></form>', '#rec-txt');
+}
+function janSancoes() {
+  abrir(cab('Avisos e sanções', 'O que recebeste nos últimos meses.') + '<div id="sanc-lista">' + carregando() + '</div><button class="btn" data-a="fechar">Fechar</button>');
+  rpc('sancoes_minhas', {}).then(function (L) {
+    var el = $('#sanc-lista'); if (!el) return;
+    el.innerHTML = !L.length ? '<p class="small muted">Não tens avisos nem sanções. Continua assim!</p>' : L.map(function (s) {
+      return '<div class="li" style="padding:10px 0;align-items:flex-start;gap:10px"><span class="grow small"><b>' + ({ aviso: 'Aviso', silencio: 'Sem escrever', fora: 'Fora do chat', banido: 'Banido do chat', provisorio: 'Em revisão' }[s.efeito] || s.efeito) + '</b>' + (s.ate ? ' até ' + fmtDataHora(s.ate) : '') +
+        '<span class="xs muted" style="display:block">' + esc(s.motivo) + ' · ' + fmtDataHora(s.t) + (s.recurso ? ' · recurso ' + ({ pendente: 'em análise', aceite: 'aceite', recusado: 'recusado' }[s.recurso] || '') : '') + '</span></span>' +
+        (s.pode_recorrer ? '<button class="btn ghost sm" data-a="recorrer" data-id="' + s.id + '">Recorrer</button>' : '') + '</div>';
+    }).join('');
+  }, function () { var el = $('#sanc-lista'); if (el) el.innerHTML = '<p class="small muted">Sem ligação à internet.</p>'; });
+}
+
+/* ---------- Painel de moderação (só a equipa) ---------- */
+function vModeracao() {
+  var head = '<div class="page-head"><div class="stack" style="gap:2px"><h1>Moderação</h1><span class="muted small">Casos graves, recursos e domínios de escolas.</span></div><button class="btn ghost sm" data-a="mod-atualizar">Atualizar</button></div>';
+  if (!CONTA || !CONTA.admin) return head + '<p class="muted">Sem acesso.</p>';
+  if (!GR.mod) { if (Date.now() - GR.modPed > 5000) { GR.modPed = Date.now(); rpc('mod_fila', {}).then(function (d) { GR.mod = d; rerenderSeguro(); }, function (e) { toast(e.message); }); } return head + carregando(); }
+  var M = GR.mod, G = [['nenhuma', 'Sem infração'], ['leve', 'Leve'], ['media', 'Média'], ['grave', 'Grave'], ['gravissima', 'Gravíssima']];
+  var msgs = !M.mensagens.length ? '<p class="small muted">Nada por rever.</p>' : M.mensagens.map(function (m) {
+    return '<article class="mod-card"><div class="row between wrap small"><b>' + nomeId(m.autor) + ' · ' + m.idade + ' anos</b><span class="xs muted">' + esc(m.grupo) + ' · ' + fmtDataHora(m.t) + '</span></div>' +
+      '<div class="mod-ctx">' + (m.contexto || []).map(function (c) { return '<span>[' + esc(c.quem) + '] ' + esc(c.texto) + '</span>'; }).join('') + '</div>' +
+      '<p style="font-size:16px;white-space:pre-wrap;overflow-wrap:anywhere"><b>«' + esc(m.texto) + '»</b>' + (m.anexo ? ' <button class="link-btn" data-a="chat-pdf" data-p="' + esc(m.anexo.path) + '">ver anexo</button>' : '') + '</p>' +
+      '<p class="xs muted">Denúncias: ' + esc((m.denuncias || []).join(', ')) + ' · sanções anteriores: ' + m.historico + (m.ia && m.ia.gravidade ? ' · IA: ' + esc(m.ia.gravidade) + ' (regra ' + m.ia.regra + ') ' + esc(m.ia.motivo || '') : '') + '</p>' +
+      '<div class="field"><label for="mod-mot-' + m.id + '" class="xs">Motivo para o aluno</label><input class="input" id="mod-mot-' + m.id + '" value="' + esc((m.ia && m.ia.motivo) || '') + '"></div>' +
+      '<div class="row wrap" style="gap:6px">' + G.map(function (g) { return '<button class="btn ' + (g[0] === 'nenhuma' ? 'ghost' : g[0] === 'gravissima' ? 'danger' : 'quiet') + ' sm" data-a="mod-decidir" data-id="' + m.id + '" data-g="' + g[0] + '" data-r="' + ((m.ia && m.ia.regra) || 1) + '">' + g[1] + '</button>'; }).join('') + '</div></article>';
+  }).join('');
+  var rec = !M.recursos.length ? '<p class="small muted">Sem recursos.</p>' : M.recursos.map(function (r) {
+    return '<article class="mod-card"><b class="small">' + nomeId(r.autor) + ' · ' + esc(r.gravidade) + ' (' + esc(r.efeito) + ')</b><p class="small">Sanção: ' + esc(r.motivo) + (r.mensagem ? '<br>Mensagem: «' + esc(r.mensagem) + '»' : '') + '</p><p class="small"><b>Recurso:</b> ' + esc(r.recurso) + '</p>' +
+      '<div class="row" style="gap:6px"><button class="btn sm" data-a="mod-recurso" data-id="' + r.id + '" data-v="1">Aceitar e anular</button><button class="btn quiet sm" data-a="mod-recurso" data-id="' + r.id + '" data-v="0">Manter a sanção</button></div></article>';
+  }).join('');
+  var dom = !M.dominios.length ? '<p class="small muted">Sem domínios por confirmar.</p>' : M.dominios.map(function (d) {
+    return '<div class="li" style="padding:8px 0;gap:8px;flex-wrap:wrap"><span class="grow small"><b>' + esc(d.dominio) + '</b><span class="xs muted" style="display:block">' + esc(d.nome) + '</span></span><button class="btn sm" data-a="mod-dominio" data-d="' + esc(d.dominio) + '" data-v="1">É de escola</button><button class="btn quiet sm" data-a="mod-dominio" data-d="' + esc(d.dominio) + '" data-v="0">Não é</button></div>';
+  }).join('');
+  return head + '<section class="card stack"><h2>Mensagens por rever (' + M.mensagens.length + ')</h2>' + msgs + '</section>' +
+    '<section class="card stack"><h2>Recursos (' + M.recursos.length + ')</h2>' + rec + '</section>' +
+    '<section class="card stack"><h2>Domínios de email por confirmar (' + M.dominios.length + ')</h2>' + dom + '</section>';
 }
 
 /* ---------- Dados oficiais (carregados quando são precisos) ---------- */
@@ -2423,19 +2843,25 @@ function render() {
   else if (UI.view === 'progresso') body = vProgresso();
   else if (UI.view === 'perfil') body = vPerfil();
   else if (UI.view === 'media') body = vMedia();
+  else if (UI.view === 'grupos' && ONLINE) body = vGrupos();
+  else if (UI.view === 'grupo' && ONLINE) body = vGrupo();
+  else if (UI.view === 'moderacao' && ONLINE) body = vModeracao();
   else body = vHoje();
   app.innerHTML = shell(body);
   renderFoco();
   if (UI.keepScroll) window.scrollTo(0, y);
   UI.keepScroll = false;
   if (UI.view === 'leitor') protegerLeitor();
+  if (UI.view === 'grupo') posChat();
   if (UI.view === 'nota') { var t = $('#nota-texto'); if (t) autoAltura(t); }
 }
 function rerender() { UI.keepScroll = true; render(); }
 
 function navItems() {
-  var top = { hoje: 'hoje', pastas: 'pastas', pasta: 'pastas', nota: 'pastas', loja: 'loja', leitor: 'loja', progresso: 'progresso', media: 'progresso', perfil: '' }[UI.view];
-  return [['hoje', 'Hoje', 'cal'], ['pastas', 'Pastas', 'folder'], ['loja', 'Loja', 'bag'], ['progresso', 'Progresso', 'chart']].map(function (x) { return { v: x[0], t: x[1], i: x[2], on: top === x[0] }; });
+  var top = { hoje: 'hoje', pastas: 'pastas', pasta: 'pastas', nota: 'pastas', loja: 'loja', leitor: 'loja', progresso: 'progresso', media: 'progresso', grupos: 'grupos', grupo: 'grupos', perfil: '', moderacao: '' }[UI.view];
+  var L = [['hoje', 'Hoje', 'cal'], ['pastas', 'Pastas', 'folder'], ['loja', 'Loja', 'bag'], ['progresso', 'Progresso', 'chart']];
+  if (ONLINE) L.splice(3, 0, ['grupos', 'Grupos', 'users']);
+  return L.map(function (x) { return { v: x[0], t: x[1], i: x[2], on: top === x[0] }; });
 }
 function shell(body) {
   var p = S.perfil, N = navItems();
@@ -3180,7 +3606,7 @@ function vProgresso() {
   ];
   var on = srvOn();
   return '<div class="page-head"><div class="stack" style="gap:2px"><h1>Progresso</h1><span class="muted small">Últimos 7 dias · ' + fmtDia(dias[0]) + ' a ' + fmtDia(t) + '</span></div><div class="seg" role="group" aria-label="Período">' + [['7', '7 dias'], ['tudo', 'Desde o início']].map(function (x) { return '<button data-a="tab-prog" data-k="' + x[0] + '" aria-pressed="' + (UI.tabProgresso === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div></div>' +
-    (on ? vRank() : '') +
+    (on ? vRank() + vRankingSemana() : '') +
     '<div class="grid2" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))">' +
       (on ? '<div class="hero" style="padding:20px;gap:8px"><span class="small" style="font-weight:600;color:var(--hero-muted)">Pontos para gastar</span><span class="hero-title num" style="font-size:36px">' + fmtN(S.pontos.saldo) + '</span><span class="xs muted">' + (CONTA ? 'Hoje: ' + fmtN(CONTA.hoje_limite || 0) + ' de ' + LIMITE_DIA + ' pontos a estudar' : 'Para subir de rank e para a loja') + '</span></div>'
         : '<div class="hero" style="padding:20px;gap:8px"><span class="small" style="font-weight:600;color:var(--hero-muted)">Pontos para gastar</span><span class="hero-title num" style="font-size:36px">' + fmtN(S.pontos.saldo) + '</span><div class="bar" style="height:6px"><i style="width:' + Math.round(nv.resto * 100 / 500) + '%"></i></div><span class="xs muted">Nível ' + nv.n + ' · faltam ' + (500 - nv.resto) + ' pontos para o nível ' + (nv.n + 1) + '</span></div>') +
@@ -3207,7 +3633,7 @@ function vPerfil() {
   var p = S.perfil, id = idade(p.nasc);
   return '<div class="page-head"><div class="row" style="align-items:center;gap:16px"><button class="avatar" data-a="foto" style="width:88px;height:88px;font-size:28px" aria-label="' + (p.foto ? 'Mudar foto de perfil' : 'Pôr foto de perfil') + '">' + avatarConteudo() + '</button><div class="stack" style="gap:6px"><div><h1>' + esc(p.nome) + '</h1><p class="small muted">' + esc(p.email) + '</p></div><div class="row wrap" style="gap:8px"><button class="btn ghost sm" data-a="foto">' + ic('camera', 'sm') + (p.foto ? 'Mudar foto' : 'Pôr foto') + '</button>' + (p.foto ? '<button class="btn quiet sm" data-a="foto-remover">Remover</button>' : '') + '</div></div></div></div>' +
     '<div class="cols"><div class="col-main">' +
-      (srvOn() ? vMeuId() : '') +
+      (srvOn() ? vMeuId() + vVerificacao() + vEquipa() : '') +
       '<section class="card stack"><div class="section-head"><h2>Escola</h2><button class="btn ghost sm" data-a="editar-perfil">' + ic('edit', 'sm') + 'Editar</button></div><dl class="summary" style="margin:0">' +
         '<dt>Escola</dt><dd>' + esc(p.escola ? p.escola.n : '') + (p.escola && (p.escola.sub || p.escola.m) ? '<span class="xs muted" style="display:block;font-weight:400">' + esc(p.escola.sub || p.escola.m) + '</span>' : '') + '</dd>' +
         (p.curso ? '<dt>Curso</dt><dd>' + esc(p.curso.n) + (p.curso.grau ? ' · ' + esc(p.curso.grau) : '') + '</dd>' : '') +
@@ -3233,7 +3659,10 @@ function abrir(html, focar) {
   var f = focar ? $(focar) : $('#layer .sheet input, #layer .sheet select, #layer .sheet button');
   if (f) f.focus();
 }
-function fechar() { $('#layer').innerHTML = ''; if (ultimoFoco && document.body.contains(ultimoFoco)) ultimoFoco.focus(); }
+function fechar() {
+  $('#layer').innerHTML = ''; if (ultimoFoco && document.body.contains(ultimoFoco)) ultimoFoco.focus();
+  if (renderPendente && !W && S.perfil && !aEditar()) { renderPendente = false; rerender(); }
+}
 function cab(t, sub) { return '<div class="sheet-head"><div class="stack" style="gap:4px"><h2 id="sheet-t">' + esc(t) + '</h2>' + (sub ? '<p class="small muted">' + esc(sub) + '</p>' : '') + '</div><button class="icon-btn" data-a="fechar" aria-label="Fechar">' + ic('x') + '</button></div>'; }
 function optsDisc(sel) { return S.disciplinas.map(function (d) { return '<option value="' + d.id + '"' + (d.id === sel ? ' selected' : '') + '>' + esc(d.n) + '</option>'; }).join(''); }
 function janAvaliacao(a, discPre) {
@@ -3320,7 +3749,8 @@ function janRegras() {
   abrir(cab('Como funcionam os pontos', 'Máximo de ' + LIMITE_DIA + ' pontos por dia a estudar, para ser justo para todos. Os prémios de presença, sequência e primeiras vezes não contam para o máximo.') +
     '<h3>Ganhar</h3><div class="list">' + REGRAS.map(function (r) { return '<div class="li"><span class="grow"><b style="display:block;font-size:15px">' + r[0] + '</b><span class="xs muted">' + r[2] + '</span></span><span class="pill lime num" style="white-space:nowrap">' + r[1] + '</span></div>'; }).join('') + '</div>' +
     '<h3>Gastar, na Loja</h3><div class="list">' + [['Resumos e formulários', 'grátis a 250', 'ficam teus para sempre'], ['Proteção da sequência', '150', 'salva um dia em que não abres a app (guardas até 2)'], ['1.ª explicação grátis', '3 000', '30 minutos com um explicador parceiro']].map(function (r) { return '<div class="li"><span class="grow"><b style="display:block;font-size:15px">' + r[0] + '</b><span class="xs muted">' + r[2] + '</span></span><span class="pill sand num" style="white-space:nowrap">' + r[1] + '</span></div>'; }).join('') + '</div>' +
-    (ONLINE ? '<h3>Ranks</h3><p class="small">Cada rank pede horas de foco e objetivos cumpridos (tarefas, temas e testes). Quando tens tudo, desbloqueias o rank com pontos e a app ganha as cores dele. As horas só contam com o temporizador da Cumpre aberto, e cada objetivo conta 24 horas depois de o criares (até 5 por dia).</p><p class="small muted">O rank nunca desce. Os pontos e as horas são contados no servidor, iguais em todos os teus aparelhos.</p>'
+    (ONLINE ? '<h3>Ranks</h3><p class="small">Cada rank pede horas de foco e objetivos cumpridos (tarefas, temas e testes). Quando tens tudo, desbloqueias o rank com pontos e a app ganha as cores dele. As horas só contam com o temporizador da Cumpre aberto, e cada objetivo conta 24 horas depois de o criares (até 5 por dia).</p><p class="small muted">O rank nunca desce. Os pontos e as horas são contados no servidor, iguais em todos os teus aparelhos. Diamante e Mentor pedem o email da escola verificado.</p>' +
+      '<h3>Ranking da semana</h3><p class="small">Recomeça à segunda. Há dois quadros: Horas (máx. 8 h por dia; as sessões começadas entre a 1:00 e as 6:00 não contam) e Cumprimento (a percentagem dos teus objetivos da semana que cumpriste, a partir de 5). Na escola e nos grupos com 10 ou mais pessoas, os 3 primeiros em horas ganham 100, 60 e 40 pontos e o top 10 % ganha 20. Quem cumpre 100 % ganha 30. Cada pessoa recebe só o maior prémio da semana.</p>'
       : '<p class="small muted">A cada 500 pontos ganhos sobes de nível. O que trocas na loja não te faz descer.</p>') + '<button class="btn" data-a="fechar">Percebi</button>');
 }
 function janResgatar(it) {
@@ -3420,6 +3850,7 @@ var A = {
         premio('foco-1', 20, 'primeira sessão em modo foco');
       }
       verPlanoCumprido();
+      avisoSaude();
     } else { toast('Sessão muito curta: não ficou registada.'); if (sid && srvOn()) rpc('foco_cancelar', { p_id: sid }).then(null, function () {}); }
     guardar(); rerender();
   },
@@ -3428,7 +3859,7 @@ var A = {
   'aval-abrir': function (el) { janVerAvaliacao(el.dataset.id, el.dataset.foco); },
   'aval-editar': function (el) { janAvaliacao(S.avaliacoes.find(function (x) { return x.id === el.dataset.id; })); },
   'aval-apagar': function (el) { janConfirmar('Apagar avaliação?', 'Apagas a data e os temas desta avaliação. Os pontos que já ganhaste ficam.', 'aval-apagar-ok', 'Apagar', el.dataset.id); },
-  'aval-apagar-ok': function (el) { S.avaliacoes = S.avaliacoes.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); fechar(); rerender(); toast('Avaliação apagada.'); },
+  'aval-apagar-ok': function (el) { var av = S.avaliacoes.find(function (x) { return x.id === el.dataset.id; }); if (av) objetivosApagar(['teste:' + av.id].concat((av.temas || []).map(function (t) { return 'tema:' + t.id; }))); S.avaliacoes = S.avaliacoes.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); fechar(); rerender(); toast('Avaliação apagada.'); },
   'tema-ok': function (el) {
     var a = S.avaliacoes.find(function (x) { return x.id === el.dataset.a2; }), t = a && a.temas.find(function (x) { return x.id === el.dataset.id; });
     if (!t) return;
@@ -3436,7 +3867,7 @@ var A = {
     if (t.ok && !t.pts) { t.pts = 1; marcarAtividade(); ganhar('tema', t.id, null, 10, 'tema revisto: ' + t.t); verPlanoCumprido(); }
     guardar(); rerender(); janVerAvaliacao(a.id, '[data-a="tema-ok"][data-id="' + t.id + '"]');
   },
-  'tema-del': function (el) { var a = S.avaliacoes.find(function (x) { return x.id === el.dataset.a2; }); a.temas = a.temas.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); rerender(); janVerAvaliacao(a.id); },
+  'tema-del': function (el) { objetivosApagar(['tema:' + el.dataset.id]); var a = S.avaliacoes.find(function (x) { return x.id === el.dataset.a2; }); a.temas = a.temas.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); rerender(); janVerAvaliacao(a.id); },
   'tarefa-ok': function (el) {
     var x = S.tarefas.find(function (t) { return t.id === el.dataset.id; });
     if (!x) return;
@@ -3444,7 +3875,7 @@ var A = {
     if (x.ok && !x.pts) { x.pts = 1; marcarAtividade(); ganhar('tarefa', x.id, null, 5, 'tarefa feita'); }
     guardar(); rerender();
   },
-  'tarefa-del': function (el) { S.tarefas = S.tarefas.filter(function (t) { return t.id !== el.dataset.id; }); guardar(); rerender(); },
+  'tarefa-del': function (el) { objetivosApagar(['tarefa:' + el.dataset.id]); S.tarefas = S.tarefas.filter(function (t) { return t.id !== el.dataset.id; }); guardar(); rerender(); },
   horario: function () { janHorario(); },
   'h-dia': function (el) { UI.hDia = Number(el.dataset.k); document.querySelectorAll('[data-a="h-dia"]').forEach(function (b) { b.setAttribute('aria-pressed', b === el); }); },
   'aula-del': function (el) { S.aulas = S.aulas.filter(function (x) { return x.id !== el.dataset.id; }); guardar(); rerender(); janHorario(); },
@@ -3587,6 +4018,36 @@ var A = {
   },
   'rank-cor': function (el) { if (!CONTA) return; var i = Number(el.dataset.i); chamar('cor_escolher', { p_rank: i >= CONTA.rank ? null : i }); },
   'id-mudar': function () { janId(); },
+  'verif-abrir': function () { if (!srvOn()) return; janVerificar(); },
+  'verif-outro': function () { janVerificar('email'); },
+  'verif-remover': function () { janConfirmar('Remover a verificação?', 'Perdes o selo e o ranking da escola. O teu rank fica igual.', 'verif-remover-ok', 'Remover'); },
+  'verif-remover-ok': function () { fechar(); chamar('verificacao_remover', {}); },
+  'rk-amb': function (el) { UI.rkAmb = el.dataset.k; rerender(); },
+  'rk-q': function (el) { UI.rkQ = el.dataset.k; rerender(); },
+  'rkg-q': function (el) { UI.rkGQ = el.dataset.k; rerender(); },
+  'rk-esconder': function () { if (!CONTA) return; GR.rk = {}; GR.rkPed = {}; chamar('ranking_esconder', { p_esconder: !CONTA.esconder }, function (c) { if (c) toast(c.esconder ? 'Já não apareces nos rankings. Continuas a ganhar rank e emblemas.' : 'Voltaste a aparecer nos rankings.'); }); },
+  'regras-chat': function () { janRegrasChat(); },
+  'regras-aceitar': function () { fechar(); chamar('regras_aceitar', {}, function (c) { if (c) toast('Regras aceites. Bom estudo!'); }); },
+  'grupo-abrir': function (el) { UI.grupoTab = null; ir('grupo', { grupo: el.dataset.id }); },
+  'grupo-tab': function (el) { UI.grupoTab = el.dataset.k; if (el.dataset.k !== 'chat') carregarGrupo(UI.grupo); rerender(); },
+  'grupo-codigo': function () { partilharCodigo(); },
+  'grupo-gerir': function (el) { gerirGrupo(el.dataset.acao, el.dataset.u || null, el.dataset.v || null); },
+  'grupo-sair': function () { janConfirmar('Sair do grupo?', 'Deixas de ver o chat e o ranking deste grupo. Para voltar precisas do código.', 'grupo-sair-ok', 'Sair', UI.grupo); },
+  'grupo-sair-ok': function (el) { var id = el.dataset.id; fechar(); rpc('grupo_sair', { p_grupo: id }).then(function () { delete GR.dados[id]; delete GR.chat[id]; GR.lista = null; GR.listaPed = 0; ir('grupos'); toast('Saíste do grupo.'); }, function () { toast('Sem ligação à internet. Tenta outra vez.'); }); },
+  'sala-abrir': function (el) { abrirSala(Number(el.dataset.dur) || 25); },
+  'sala-entrar': function (el) { entrarSala(Number(el.dataset.min) || 25); },
+  'msg-menu': function (el) { janMsg(Number(el.dataset.id)); },
+  'msg-apagar': function (el) { var id = Number(el.dataset.id); fechar(); rpc('chat_apagar', { p_msg: id }).then(function () { marcarMsg(id, 'apagada'); }, function () { toast('Sem ligação à internet.'); }); },
+  'msg-denunciar': function (el) { janDenunciar(Number(el.dataset.id)); },
+  'chat-anexo': function () { var i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*,application/pdf'; i.onchange = function () { if (i.files && i.files[0]) subirChat(i.files[0], UI.grupo); }; i.click(); },
+  'chat-pdf': function (el) { urlChat(el.dataset.p).then(function (u) { if (u) window.open(u, '_blank', 'noopener'); }); },
+  'chat-mais': function () { carregarChat(UI.grupo, true); },
+  recorrer: function (el) { janRecorrer(Number(el.dataset.id)); },
+  'sancoes-ver': function () { janSancoes(); },
+  'mod-decidir': function (el) { var id = el.dataset.id, mt = $('#mod-mot-' + id); rpc('mod_decidir', { p_msg: Number(id), p_grav: el.dataset.g, p_regra: Number(el.dataset.r) || 1, p_motivo: mt ? mt.value : '' }).then(function (d) { GR.mod = d; rerender(); toast('Decisão guardada.'); }, function (e) { toast(e.message || 'Não deu.'); }); },
+  'mod-recurso': function (el) { rpc('mod_recurso', { p_id: Number(el.dataset.id), p_aceitar: el.dataset.v === '1' }).then(function (d) { GR.mod = d; rerender(); }, function (e) { toast(e.message || 'Não deu.'); }); },
+  'mod-dominio': function (el) { rpc('mod_dominio', { p_dominio: el.dataset.d, p_confirmar: el.dataset.v === '1', p_nome: null }).then(function (d) { GR.mod = d; rerender(); }, function (e) { toast(e.message || 'Não deu.'); }); },
+  'mod-atualizar': function () { GR.mod = null; rerender(); },
   'fechar-fundo': function (el, e) { if (e.target === el) fechar(); }
 };
 
@@ -3691,12 +4152,78 @@ document.addEventListener('change', function (e) {
   if (t.dataset.w === 'lingua2' && W) { W.lingua2 = t.value; }
   if (t.dataset.n === 'disc' && UI.view === 'nota') { var x = S.notas.find(function (n) { return n.id === UI.nota; }); if (x) { x.disc = t.value; x.upd = Date.now(); guardar(); rerender(); } }
 });
+document.addEventListener('keydown', function (e) {
+  if (e.target && e.target.id === 'chat-txt' && e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); var fm = e.target.form; if (fm) fm.requestSubmit ? fm.requestSubmit() : fm.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true })); }
+});
+document.addEventListener('input', function (e) { if (e.target && e.target.id === 'chat-txt') { e.target.style.height = 'auto'; e.target.style.height = Math.min(140, e.target.scrollHeight) + 'px'; } });
 document.addEventListener('submit', function (e) {
   var f = e.target; e.preventDefault();
   if (f.id === 'ob') { avancar(); return; }
   if (f.id === 'auth') { if (!AUTH.ocupado) enviarAuth(); return; }
   if (f.id === 'link') { enviarLink(); return; }
   var k = f.dataset.f;
+  if (k === 'verif-email') {
+    var ve = ($('#ve').value || '').trim(), bve = f.querySelector('button[type="submit"]');
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(ve)) { erroForm('#ve-err', 'Escreve o email completo da escola.'); return; }
+    bve.disabled = true; bve.textContent = 'A enviar…';
+    supa.functions.invoke('cumpre', { body: { acao: 'verificar-enviar', email: ve } }).then(function (r) {
+      if (r.error) return erroFuncao(r.error).then(function (m) { throw { pt: m }; });
+      if (r.data && r.data.erro) throw { pt: r.data.erro };
+      chamar('conta_estado', {}); janVerificar('codigo', ve);
+    }).catch(function (e) { bve.disabled = false; bve.textContent = 'Enviar código'; erroForm('#ve-err', (e && e.pt) || 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
+  if (k === 'verif-codigo') {
+    var vc = ($('#vc').value || '').replace(/\D/g, ''), bvc = f.querySelector('button[type="submit"]');
+    if (vc.length !== 6) { erroForm('#vc-err', 'O código tem 6 algarismos.'); return; }
+    bvc.disabled = true;
+    rpc('verificar_confirmar', { p_codigo: vc }).then(function (c) {
+      bvc.disabled = false;
+      if (!c.ok) { erroForm('#vc-err', c.erro || 'Código errado.'); return; }
+      GR.rk = {}; GR.rkPed = {}; fechar(); aplicarConta(c);
+      toast(c.pendente ? 'Código certo! Estamos a confirmar que o email é da tua escola.' : 'Email verificado. Já tens o selo ✓.');
+    }, function () { bvc.disabled = false; erroForm('#vc-err', 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
+  if (k === 'grupo-entrar' || k === 'grupo-criar') {
+    var gi = $(k === 'grupo-entrar' ? '#g-cod' : '#g-nome'), gv = (gi.value || '').trim(), ge = k === 'grupo-entrar' ? '#g-cod-err' : '#g-nome-err', gb = f.querySelector('button[type="submit"]');
+    if (!gv) { gi.focus(); return; }
+    gb.disabled = true;
+    rpc(k === 'grupo-entrar' ? 'grupo_entrar' : 'grupo_criar', k === 'grupo-entrar' ? { p_codigo: gv } : { p_nome: gv }).then(function (r) {
+      gb.disabled = false;
+      if (!r.ok) { if (r.erro === 'regras') janRegrasChat(true); else erroForm(ge, r.erro); return; }
+      GR.lista = null; GR.listaPed = 0;
+      if (r.pendente) toast('Pedido enviado. Quem criou o grupo tem de te aceitar.');
+      else toast(k === 'grupo-criar' ? 'Grupo criado. Partilha o código com os teus colegas.' : r.ja ? 'Já estás neste grupo.' : 'Entraste no grupo.');
+      UI.grupoTab = null; ir('grupo', { grupo: r.grupo });
+    }, function () { gb.disabled = false; erroForm(ge, 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
+  if (k === 'chat') {
+    var ta = $('#chat-txt'), txt = (ta.value || '').trim(), cb = f.querySelector('button[type="submit"]');
+    if (!txt) { ta.focus(); return; }
+    cb.disabled = true;
+    enviarMsg(f.dataset.id, txt, null).then(function (ok) { cb.disabled = false; if (ok) { ta.value = ''; ta.style.height = ''; } ta.focus(); });
+    return;
+  }
+  if (k === 'denuncia') {
+    var dm = (f.querySelector('input[name="den"]:checked') || {}).value;
+    if (!dm) { erroForm('#den-err', 'Escolhe o motivo.'); return; }
+    var did = Number(f.dataset.id);
+    rpc('chat_denunciar', { p_msg: did, p_motivo: dm }).then(function (r) {
+      if (!r.ok) { erroForm('#den-err', r.erro); return; }
+      fechar(); toast(r.ja ? 'Já tinhas denunciado esta mensagem.' : 'Obrigado. Vamos rever esta mensagem.'); carregarChat(UI.grupo, true);
+    }, function () { erroForm('#den-err', 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
+  if (k === 'recurso') {
+    var rt = ($('#rec-txt').value || '').trim();
+    rpc('sancao_recorrer', { p_id: Number(f.dataset.id), p_texto: rt }).then(function (r) {
+      if (!r.ok) { erroForm('#rec-err', r.erro); return; }
+      fechar(); toast('Recurso enviado. A equipa responde em 72 horas.'); chamar('conta_estado', {});
+    }, function () { erroForm('#rec-err', 'Sem ligação à internet. Tenta outra vez.'); });
+    return;
+  }
   if (k === 'id') {
     var nm = ($('#id-nome').value || '').trim().toLowerCase().replace(/^@/, '');
     if (!/^[a-z0-9_.]{3,16}$/.test(nm)) { erroForm('#id-err', 'Usa 3 a 16 letras minúsculas, números, _ ou . (sem acentos nem espaços).'); return; }
